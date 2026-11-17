@@ -1,6 +1,6 @@
 import type { PyodideAPI as Pyodide } from 'pyodide'
 import type { Challenge, ExecutionResult } from './types'
-import { execute } from './execute'
+import { execute, GAME_NAMES } from './execute'
 
 
 declare const WorkerGlobalScope: unknown
@@ -19,8 +19,6 @@ function loadPyodide(): Promise<Pyodide> {
   return pyodide
 }
 
-const NAMES = ['move', 'turnLeft', 'turnRight', 'pickUp', 'pathClear', 'hasItem', 'atGoal']
-
 /**
  * Roda Python reaproveitando a simulação do JavaScript: o `execute` chama uma
  * ponte global que expõe as Ações (move, turnLeft...) ao Python e roda o código.
@@ -31,7 +29,7 @@ export async function executePython(challenge: Challenge, code: string): Promise
   const g = globalThis as Record<string, unknown>
   g.__runPython = (...fns: Array<() => unknown>) => {
     let gameFailure: unknown
-    NAMES.forEach((name, i) =>
+    GAME_NAMES.forEach((name, i) =>
       py.globals.set(name, () => {
         try {
           return fns[i]()
@@ -45,11 +43,14 @@ export async function executePython(challenge: Challenge, code: string): Promise
       py.runPython(code)
     } catch (e) {
       if (gameFailure) throw gameFailure
-      throw new Error((e as Error).message.trim().split('\n').pop())
+      const last = (e as Error).message.trim().split('\n').pop() ?? ''
+      // Erros de sintaxe do Python viram SyntaxError, para o `execute` classificá-los como no JavaScript.
+      if (/^(Syntax|Indentation|Tab)Error/.test(last)) throw new SyntaxError(last)
+      throw new Error(last)
     }
   }
   try {
-    return execute(challenge, `__runPython(${NAMES.join(', ')})`)
+    return execute(challenge, `__runPython(${GAME_NAMES.join(', ')})`)
   } finally {
     delete g.__runPython
   }

@@ -7,8 +7,9 @@
  * `programa { funcao inicio() { ... } }`.
  */
 
+/** O `detail` é o diagnóstico do compilador, escrito em pt-BR (único texto de jogador fora das traduções). */
 export class PortugolError extends Error {
-  constructor(public line: number, detail: string) {
+  constructor(public line: number, public detail: string) {
     super(`linha ${line}: ${detail}`)
   }
 }

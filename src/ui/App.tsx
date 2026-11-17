@@ -2,32 +2,39 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { runChallenge } from '../engine/runChallenge'
 import { replay, type Frame } from '../engine/replay'
 import type { Language, RunResult } from '../engine/types'
-import { firstChallenge } from '../challenges/first'
 import { languageName, starterFor } from '../languages'
 import { LanguagePicker } from './LanguagePicker'
-import { t } from '../i18n/pt-BR'
+import { t, type TextKey } from '../i18n/pt-BR'
+import { failureText } from '../i18n/failureText'
 import { BlocksEditor } from './BlocksEditor'
-import { generateCode } from '../blocks/generators'
+import { generateCode, type BlocklyState } from '../blocks/generators'
 import { Board } from './Board'
 import { offersBlocks, rememberBlockCode, migratedCodeFor } from './editorMode'
 import { playableChallenges } from '../challenges/concepts'
 import { Stars } from './Stars'
-import { loadStars, saveStars } from './progress'
+import { loadStars, recordResult } from './progress'
 import type { Star } from '../engine/types'
 
 const BASE_MS = 600
 
-export function App({ challengeId }: { challengeId?: string }) {
-  const challenge = (challengeId && playableChallenges[challengeId]) || firstChallenge
+type AppProps = {
+  challengeId: string
+  /** Linguagem escolhida (guardada acima, em Home, e persistida). Null: ainda não escolheu. */
+  language: Language | null
+  onLanguageChange: (language: Language) => void
+  /** Código digitado deste Desafio, por Linguagem; guardado acima para não se perder ao voltar. */
+  codes: Partial<Record<Language, string>>
+  onCodesChange: (codes: Partial<Record<Language, string>>) => void
+}
+
+export function App({ challengeId, language, onLanguageChange, codes, onCodesChange }: AppProps) {
+  const challenge = playableChallenges[challengeId]
   const blocksOffered = offersBlocks(challenge.id)
   const initialFrame = (): Frame => replay(challenge, [])[0]
   const [introDone, setIntroDone] = useState(blocksOffered)
-  const [language, setLanguage] = useState<Language | null>(null)
-  // O código é guardado por Linguagem: trocar de Linguagem não perde o que foi escrito.
-  const [codes, setCodes] = useState<Partial<Record<Language, string>>>({})
   const [mode, setMode] = useState<'blocks' | 'code'>(blocksOffered ? 'blocks' : 'code')
-  const [blockState, setBlockState] = useState<object | null>(null)
-  // No modo Blocos o código é o equivalente gerado na Linguagem escolhida.
+  const [blockState, setBlockState] = useState<BlocklyState | null>(null)
+  // No modo Blocos visuais o código é o equivalente gerado na Linguagem escolhida.
   const blockCode = useMemo(
     () => (language && blockState ? generateCode(blockState, language) : ''),
     [language, blockState],
@@ -37,7 +44,8 @@ export function App({ challengeId }: { challengeId?: string }) {
   }, [language, blockCode, blocksOffered])
   const typedCode = language ? (codes[language] ?? (blocksOffered ? undefined : migratedCodeFor(language)) ?? starterFor(language)) : ''
   const code = mode === 'blocks' ? blockCode : typedCode
-  const setCode = (c: string) => language && setCodes((prev) => ({ ...prev, [language]: c }))
+  // O código é guardado por Linguagem: trocar de Linguagem não perde o que foi escrito.
+  const setCode = (c: string) => language && onCodesChange({ ...codes, [language]: c })
   const [frames, setFrames] = useState<Frame[]>([initialFrame()])
   const [index, setIndex] = useState(0)
   const [playing, setPlaying] = useState(false)
@@ -47,6 +55,8 @@ export function App({ challengeId }: { challengeId?: string }) {
   const [earned, setEarned] = useState<Star[]>(() => loadStars(challenge.id))
   const [hintShown, setHintShown] = useState(false)
   const result = useRef<RunResult | null>(null)
+  // Estrelas já gravadas ao chegar o resultado; só aparecem no fim do replay.
+  const pendingStars = useRef<Star[]>([])
 
   const reset = (msg = '') => {
     setPlaying(false)
@@ -64,12 +74,20 @@ export function App({ challengeId }: { challengeId?: string }) {
     try {
       const r = await runChallenge(challenge, language!, code, undefined, undefined, hintShown)
       result.current = r
+      // Grava já: sair ou reiniciar no meio do replay não perde um Desafio resolvido.
+      pendingStars.current = recordResult(challenge.id, r)
+      const failure = r.status === 'failed' ? t('failed', { reason: failureText(r.reason) }) : ''
+      if (r.status === 'failed' && (r.reason?.code === 'actionLimit' || r.actions.length === 0)) {
+        // Replay de milhares de Ações levaria minutos (ou não há o que mostrar): avisa e reinicia na hora.
+        reset(failure)
+        return
+      }
       setFrames(replay(challenge, r.actions))
       setIndex(0)
-      setMessage('')
+      setMessage(failure) // a mensagem de falha aparece assim que o resultado chega
       setPlaying(true)
     } catch (e) {
-      reset(t('failed', { reason: (e as Error).message }))
+      reset(t('failed', { reason: failureText({ code: 'runtimeError' }) }))
     }
   }
 
@@ -83,10 +101,10 @@ export function App({ challengeId }: { challengeId?: string }) {
       if (r?.status === 'solved') {
         setBusy(false)
         setMessage(t('solved'))
-        setEarned(saveStars(challenge.id, r.stars))
+        setEarned(pendingStars.current)
       } else {
         // Falhar reinicia o Desafio sem punição.
-        reset(t('failed', { reason: r?.reason ?? '' }))
+        reset(t('failed', { reason: failureText(r?.reason) }))
       }
       return
     }
@@ -106,7 +124,7 @@ export function App({ challengeId }: { challengeId?: string }) {
       <main style={{ fontFamily: 'monospace', padding: 16, maxWidth: 960 }}>
         <h1>{t('title')}</h1>
         <h2>{t('chooseLanguage')}</h2>
-        <LanguagePicker value={null} onChange={setLanguage} />
+        <LanguagePicker value={null} onChange={onLanguageChange} />
       </main>
     )
   }
@@ -120,7 +138,7 @@ export function App({ challengeId }: { challengeId?: string }) {
           value={language}
           onChange={(l) => {
             reset()
-            setLanguage(l)
+            onLanguageChange(l)
           }}
         />
       </details>
@@ -130,7 +148,7 @@ export function App({ challengeId }: { challengeId?: string }) {
       <Stars earned={earned} />
       {challenge.hint && (
         hintShown ? (
-          <p role="note"><strong>{t('hintLabel')}:</strong> {challenge.hint}</p>
+          <p role="note"><strong>{t('hintLabel')}:</strong> {t(challenge.hint as TextKey)}</p>
         ) : (
           <button onClick={askHint} title={t('hintWarning')}>{t('hintButton')}</button>
         )

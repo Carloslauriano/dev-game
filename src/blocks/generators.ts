@@ -1,13 +1,20 @@
 import * as Blockly from 'blockly/core'
 import type { Language } from '../engine/types'
+import { PORTUGOL_NAMES } from '../engine/portugol'
 import { defineBlocks } from './blocks'
+
+/** Programa de Blocos serializado (JSON do Blockly). */
+export type BlocklyState = object
 
 type Gen = Blockly.CodeGenerator
 type Emit = (block: Blockly.Block, gen: Gen) => string | [string, number]
 
 type Syntax = {
-  actions: Record<string, string>
-  sensors: Record<string, string>
+  /** Nome, na Linguagem, da Ação ou Sensor do jogo (nomes do `execute` -> nomes visíveis ao jogador). */
+  name: (gameName: string) => string
+  /** Fim de um comando de Ação. */
+  terminator: string
+  falseLiteral: string
   repeat: (times: number, body: string, depth: number) => string
   whileLoop: (cond: string, body: string) => string
   ifElse: (cond: string, thenBody: string, elseBody: string) => string
@@ -28,9 +35,13 @@ const SENSOR_TYPES: Record<string, string> = {
   sensor_at_goal: 'atGoal',
 }
 
+/** Inverso de PORTUGOL_NAMES: nome do jogo -> nome em Portugol. */
+const portugolName = Object.fromEntries(Object.entries(PORTUGOL_NAMES).map(([pt, game]) => [game, pt]))
+
 const js: Syntax = {
-  actions: { move: 'move();', turnLeft: 'turnLeft();', turnRight: 'turnRight();', pickUp: 'pickUp();' },
-  sensors: { pathClear: 'pathClear()', hasItem: 'hasItem()', atGoal: 'atGoal()' },
+  name: (n) => n,
+  terminator: ';',
+  falseLiteral: 'false',
   repeat: (n, body, d) => `for (let i${d} = 0; i${d} < ${n}; i${d}++) {\n${body}}\n`,
   whileLoop: (c, body) => `while (${c}) {\n${body}}\n`,
   ifElse: (c, a, b) => `if (${c}) {\n${a}}${b ? ` else {\n${b}}` : ''}\n`,
@@ -39,8 +50,9 @@ const js: Syntax = {
 }
 
 const python: Syntax = {
-  actions: { move: 'move()', turnLeft: 'turnLeft()', turnRight: 'turnRight()', pickUp: 'pickUp()' },
-  sensors: { pathClear: 'pathClear()', hasItem: 'hasItem()', atGoal: 'atGoal()' },
+  name: (n) => n,
+  terminator: '',
+  falseLiteral: 'False',
   repeat: (n, body, d) => `for i${d} in range(${n}):\n${body}`,
   whileLoop: (c, body) => `while ${c}:\n${body}`,
   ifElse: (c, a, b) => `if ${c}:\n${a}${b ? `else:\n${b}` : ''}`,
@@ -49,8 +61,9 @@ const python: Syntax = {
 }
 
 const portugol: Syntax = {
-  actions: { move: 'andar()', turnLeft: 'virarEsquerda()', turnRight: 'virarDireita()', pickUp: 'pegar()' },
-  sensors: { pathClear: 'caminhoLivre()', hasItem: 'temItem()', atGoal: 'naMeta()' },
+  name: (n) => portugolName[n],
+  terminator: '',
+  falseLiteral: 'falso',
   repeat: (n, body, d) => `para (inteiro i${d} = 0; i${d} < ${n}; i${d}++) {\n${body}}\n`,
   whileLoop: (c, body) => `enquanto (${c}) {\n${body}}\n`,
   ifElse: (c, a, b) => `se (${c}) {\n${a}}${b ? ` senao {\n${b}}` : ''}\n`,
@@ -87,10 +100,10 @@ function makeGenerator(language: Language): Gen {
     return code + (next && !thisOnly ? gen.blockToCode(next) : '')
   }
   const forBlock = gen.forBlock as Record<string, Emit>
-  const falseLiteral = language === 'python' ? 'False' : language === 'portugol' ? 'falso' : 'false'
+  const { falseLiteral } = syntax
 
-  for (const [type, name] of Object.entries(ACTION_TYPES)) forBlock[type] = () => syntax.actions[name] + '\n'
-  for (const [type, name] of Object.entries(SENSOR_TYPES)) forBlock[type] = () => [syntax.sensors[name], 0]
+  for (const [type, name] of Object.entries(ACTION_TYPES)) forBlock[type] = () => `${syntax.name(name)}()${syntax.terminator}\n`
+  for (const [type, name] of Object.entries(SENSOR_TYPES)) forBlock[type] = () => [`${syntax.name(name)}()`, 0]
   forBlock.logic_not_block = (b, g) => [syntax.not(condition(g, b, 'VALUE', falseLiteral)), 0]
   forBlock.repeat_times = (b, g) =>
     syntax.repeat(Math.max(0, Math.floor(Number(b.getFieldValue('TIMES')) || 0)), body(g, b, 'DO', syntax), loopDepth(b))
@@ -105,7 +118,7 @@ function makeGenerator(language: Language): Gen {
 const generators: Partial<Record<Language, Gen>> = {}
 
 /** Gera o código da Linguagem a partir de um programa de Blocos serializado (JSON do Blockly). Função pura. */
-export function generateCode(state: object, language: Language): string {
+export function generateCode(state: BlocklyState, language: Language): string {
   defineBlocks()
   const workspace = new Blockly.Workspace()
   try {

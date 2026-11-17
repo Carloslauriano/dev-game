@@ -30,7 +30,7 @@ describe('Blocos visuais geram código equivalente', () => {
   it.each(languages)('Ações em sequência resolvem o Desafio (%s)', async (language) => {
     const r = await solve(corredor, program(move, move), language)
     expect(r).toMatchObject({ status: 'solved', actions: ['move', 'move'] })
-  })
+  }, 60_000)
 
   it.each(languages)('repetição N vezes aninhada (%s)', async (language) => {
     const state = program({

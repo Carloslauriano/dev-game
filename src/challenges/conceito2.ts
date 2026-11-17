@@ -15,7 +15,7 @@ export const conceito2Challenges: Challenge[] = [
     obstacles: [],
     items: [],
     maxInstructions: 1,
-    hint: 'Dica de exemplo: o corredor tem 7 passos iguais. Repita o mesmo passo 7 vezes em vez de escrever 7 linhas.',
+    hint: 'hint_repeticao-1',
   },
   {
     id: 'repeticao-2',
@@ -27,7 +27,7 @@ export const conceito2Challenges: Challenge[] = [
     obstacles: [],
     items: [{ x: 2, y: 0 }, { x: 4, y: 0 }, { x: 6, y: 0 }],
     maxInstructions: 3,
-    hint: 'Dica de exemplo: os itens aparecem a cada 2 casas. Descubra o par de passos que se repete e repita 3 vezes.',
+    hint: 'hint_repeticao-2',
   },
   {
     id: 'repeticao-3',
@@ -39,7 +39,7 @@ export const conceito2Challenges: Challenge[] = [
     obstacles: [{ x: 2, y: 0 }, { x: 3, y: 1 }, { x: 4, y: 2 }],
     items: [],
     maxInstructions: 4,
-    hint: 'Dica de exemplo: a escada repete "andar, virar, andar, virar de volta". Quantos degraus ela tem?',
+    hint: 'hint_repeticao-3',
   },
   {
     id: 'repeticao-4',
@@ -51,7 +51,7 @@ export const conceito2Challenges: Challenge[] = [
     obstacles: [],
     items: [{ x: 3, y: 0 }, { x: 3, y: 3 }, { x: 0, y: 3 }],
     maxInstructions: 5,
-    hint: 'Dica de exemplo: contorne o anel. Cada lado tem 3 passos, um item e uma curva. Repita o lado 3 vezes.',
+    hint: 'hint_repeticao-4',
   },
   {
     id: 'repeticao-5',
@@ -63,7 +63,7 @@ export const conceito2Challenges: Challenge[] = [
     obstacles: [{ x: 1, y: 6 }, { x: 2, y: 6 }, { x: 3, y: 6 }],
     items: [],
     maxInstructions: 12,
-    hint: 'Dica de exemplo: a cobra desce duas linhas por volta (ida, desce, volta, desce). Repita a volta 3 vezes.',
+    hint: 'hint_repeticao-5',
   },
 ]
 

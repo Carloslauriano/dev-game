@@ -7,7 +7,7 @@ const desafio: Challenge = {
   goal: { x: 2, y: 0 }, walls: [], obstacles: [], items: [],
 }
 const resolvido: ExecutionResult = { status: 'solved', actions: ['move', 'move'] }
-const falhou: ExecutionResult = { status: 'failed', actions: [], reason: 'bateu' }
+const falhou: ExecutionResult = { status: 'failed', actions: [], reason: { code: 'hitWall' } }
 
 describe('computeStars e Dica', () => {
   it('resolver sem pedir Dica ganha a Estrela de sem Dica', () => {

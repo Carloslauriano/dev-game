@@ -1,6 +1,5 @@
 import type { Concept } from '../engine/concepts'
 import type { Challenge } from '../engine/types'
-import { firstChallenge } from './first'
 import { conceito2ById } from './conceito2'
 import { condicaoChallenges } from './conceito3'
 import { conceito4 } from './conceito4'
@@ -19,12 +18,11 @@ export const concepts: Concept[] = [
   { id: 'repeticao', challengeIds: slots('repeticao') },
   { id: 'condicao', challengeIds: slots('condicao') },
   { id: 'repeticao-condicao', challengeIds: slots('repeticao-condicao') },
-  { id: 'variaveis', challengeIds: slots('variaveis') },
+  { id: 'variaveis', challengeIds: slots('variaveis'), typedCodeOnly: true },
 ]
 
 /** Desafios com conteúdo, por id. Os demais aparecem como "em breve". */
 export const playableChallenges: Record<string, Challenge> = {
-  [firstChallenge.id]: firstChallenge,
   ...conceito2ById,
   ...Object.fromEntries(condicaoChallenges.map((c) => [c.id, c])),
   ...Object.fromEntries(conceito4.map((c) => [c.id, c])),

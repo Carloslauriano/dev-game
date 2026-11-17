@@ -18,7 +18,7 @@ export const conceito4: Challenge[] = [
     obstacles: [],
     items: [],
     maxInstructions: 1,
-    hint: 'Não conte os passos: repita andar() até o Sensor atGoal() dizer que chegou.',
+    hint: 'hint_repeticao-condicao-1',
   },
   {
     // Corredor até a parede da borda, com um item no fim.
@@ -31,7 +31,7 @@ export const conceito4: Challenge[] = [
     obstacles: [],
     items: [{ x: 7, y: 0 }],
     maxInstructions: 2,
-    hint: 'Ande enquanto o caminho estiver livre (pathClear) e pegue o item quando parar.',
+    hint: 'hint_repeticao-condicao-2',
   },
   {
     // Dois corredores em L: leste até a parede, depois sul até a parede.
@@ -44,7 +44,7 @@ export const conceito4: Challenge[] = [
     obstacles: [],
     items: [],
     maxInstructions: 4,
-    hint: 'Use uma repetição para cada corredor, e vire à direita entre elas.',
+    hint: 'hint_repeticao-condicao-3',
   },
   {
     // Três corredores: leste, sul e leste de novo, cada um parando numa parede.
@@ -57,7 +57,7 @@ export const conceito4: Challenge[] = [
     obstacles: [],
     items: [],
     maxInstructions: 5,
-    hint: 'São três corredores: ande enquanto o caminho estiver livre, vire, e repita a ideia.',
+    hint: 'hint_repeticao-condicao-4',
   },
   {
     // Contorno do mapa: dentro de um único laço, andar se livre, senão virar à direita.
@@ -70,7 +70,7 @@ export const conceito4: Challenge[] = [
     obstacles: [],
     items: [],
     maxInstructions: 2,
-    hint: 'Uma só repetição basta: até chegar à meta, se o caminho está livre ande, senão vire à direita.',
+    hint: 'hint_repeticao-condicao-5',
   },
 ]
 
