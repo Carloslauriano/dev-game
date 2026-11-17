@@ -4,7 +4,7 @@ const ACTION_CALL = /\b(move|turnLeft|turnRight|pickUp)\s*\(/g
 
 /** Conta as instruções do programa: chamadas de Ação no texto, ignorando comentários. */
 export function countInstructions(code: string): number {
-  const semComentarios = code.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '')
+  const semComentarios = code.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '').replace(/(^|\s)#.*$/gm, '$1')
   return (semComentarios.match(ACTION_CALL) ?? []).length
 }
 

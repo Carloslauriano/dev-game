@@ -17,7 +17,7 @@ export type Challenge = {
   hint?: string
 }
 
-export type Language = 'javascript'
+export type Language = 'javascript' | 'python'
 
 export type Action = 'move' | 'turnLeft' | 'turnRight' | 'pickUp'
 
@@ -37,7 +37,7 @@ export type RunResult = {
 /** Resultado do worker, antes de o seam calcular as Estrelas. */
 export type ExecutionResult = Omit<RunResult, 'stars'>
 
-export type WorkerRequest = { challenge: Challenge; code: string }
+export type WorkerRequest = { challenge: Challenge; language: Language; code: string }
 
 /** Contrato mínimo de um Web Worker, para permitir injeção em testes. */
 export interface WorkerLike {

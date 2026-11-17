@@ -13,12 +13,9 @@ export function runChallenge(
   language: Language,
   code: string,
   createWorker: () => WorkerLike = browserWorker,
-  timeoutMs = 3000,
+  timeoutMs = language === 'python' ? 60_000 : 3000, // Python inclui o carregamento do Pyodide
   hintUsed = false,
 ): Promise<RunResult> {
-  if (language !== 'javascript') {
-    return Promise.reject(new Error(`Linguagem não suportada: ${language}`))
-  }
   return new Promise((resolve, reject) => {
     const worker = createWorker()
     // Loop sem Ações trava o worker: o tempo limite o encerra e a interface segue livre.
@@ -42,6 +39,6 @@ export function runChallenge(
       worker.terminate()
       reject(new Error(event.message ?? 'erro no worker'))
     }
-    worker.postMessage({ challenge, code })
+    worker.postMessage({ challenge, language, code })
   })
 }
