@@ -25,7 +25,7 @@ export function Home() {
         <button onClick={() => setScreen({ name: 'concepts' })} style={{ margin: 16 }}>
           {t('back')}
         </button>
-        <App />
+        <App challengeId={screen.challengeId} />
       </>
     )
   }

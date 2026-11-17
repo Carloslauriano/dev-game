@@ -4,6 +4,7 @@ import { firstChallenge } from './first'
 import { conceito2ById } from './conceito2'
 import { condicaoChallenges } from './conceito3'
 import { conceito4 } from './conceito4'
+import { conceito5 } from './conceito5'
 import { conceito1Challenges } from './conceito1'
 
 /**
@@ -27,5 +28,6 @@ export const playableChallenges: Record<string, Challenge> = {
   ...conceito2ById,
   ...Object.fromEntries(condicaoChallenges.map((c) => [c.id, c])),
   ...Object.fromEntries(conceito4.map((c) => [c.id, c])),
+  ...Object.fromEntries(conceito5.map((c) => [c.id, c])),
   ...Object.fromEntries(conceito1Challenges.map((c) => [c.id, c])),
 }

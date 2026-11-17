@@ -9,26 +9,33 @@ import { t } from '../i18n/pt-BR'
 import { BlocksEditor } from './BlocksEditor'
 import { generateCode } from '../blocks/generators'
 import { Board } from './Board'
+import { offersBlocks, rememberBlockCode, migratedCodeFor } from './editorMode'
+import { playableChallenges } from '../challenges/concepts'
 import { Stars } from './Stars'
 import { loadStars, saveStars } from './progress'
 import type { Star } from '../engine/types'
 
-const challenge = firstChallenge
-const initialFrame = (): Frame => replay(challenge, [])[0]
 const BASE_MS = 600
 
-export function App() {
+export function App({ challengeId }: { challengeId?: string }) {
+  const challenge = (challengeId && playableChallenges[challengeId]) || firstChallenge
+  const blocksOffered = offersBlocks(challenge.id)
+  const initialFrame = (): Frame => replay(challenge, [])[0]
+  const [introDone, setIntroDone] = useState(blocksOffered)
   const [language, setLanguage] = useState<Language | null>(null)
   // O código é guardado por Linguagem: trocar de Linguagem não perde o que foi escrito.
   const [codes, setCodes] = useState<Partial<Record<Language, string>>>({})
-  const [mode, setMode] = useState<'blocks' | 'code'>('blocks')
+  const [mode, setMode] = useState<'blocks' | 'code'>(blocksOffered ? 'blocks' : 'code')
   const [blockState, setBlockState] = useState<object | null>(null)
   // No modo Blocos o código é o equivalente gerado na Linguagem escolhida.
   const blockCode = useMemo(
     () => (language && blockState ? generateCode(blockState, language) : ''),
     [language, blockState],
   )
-  const typedCode = language ? (codes[language] ?? starterFor(language)) : ''
+  useEffect(() => {
+    if (language && blocksOffered) rememberBlockCode(language, blockCode)
+  }, [language, blockCode, blocksOffered])
+  const typedCode = language ? (codes[language] ?? (blocksOffered ? undefined : migratedCodeFor(language)) ?? starterFor(language)) : ''
   const code = mode === 'blocks' ? blockCode : typedCode
   const setCode = (c: string) => language && setCodes((prev) => ({ ...prev, [language]: c }))
   const [frames, setFrames] = useState<Frame[]>([initialFrame()])
@@ -128,14 +135,24 @@ export function App() {
           <button onClick={askHint} title={t('hintWarning')}>{t('hintButton')}</button>
         )
       )}
-      <div role="radiogroup" aria-label={t('editorMode')} style={{ display: 'flex', gap: 8 }}>
+      {!introDone && language && (
+        <section role="note" aria-label={t('migrationTitle')}>
+          <h3>{t('migrationTitle')}</h3>
+          <p>{t('migrationIntro')}</p>
+          <p>{t('migrationVariables')}</p>
+          <pre>{migratedCodeFor(language) ?? starterFor(language)}</pre>
+          <p>{t('migrationYourCode')}</p>
+          <button onClick={() => setIntroDone(true)}>{t('migrationStart')}</button>
+        </section>
+      )}
+      {blocksOffered && <div role="radiogroup" aria-label={t('editorMode')} style={{ display: 'flex', gap: 8 }}>
         {(['blocks', 'code'] as const).map((m) => (
           <button key={m} role="radio" aria-checked={mode === m} onClick={() => setMode(m)}>
             {mode === m ? '● ' : ''}
             {m === 'blocks' ? t('editorBlocks') : t('editorCode')}
           </button>
         ))}
-      </div>
+      </div>}
       {mode === 'blocks' ? (
         <div style={{ display: 'flex', gap: 8 }}>
           <div style={{ flex: 2 }}>

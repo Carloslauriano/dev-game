@@ -60,6 +60,11 @@ export const ptBR = {
   toolbox_actions: 'Ações',
   toolbox_loops: 'Repetição',
   toolbox_conditions: 'Condição',
+  migrationTitle: 'Agora você escreve código',
+  migrationIntro: 'A partir deste Conceito não há mais Blocos: você digita o código na Linguagem escolhida. É o mesmo raciocínio dos Blocos, só que escrito.',
+  migrationVariables: 'Novidade: variáveis. Uma variável guarda um número com um nome, e você pode mudá-lo e reusá-lo. Abaixo está o código equivalente ao que você montou nos Blocos (ou o código inicial), que será seu ponto de partida.',
+  migrationYourCode: 'Edite o código na caixa de texto e use Executar para testar.',
+  migrationStart: 'Entendi, vamos lá',
   toolbox_sensors: 'Sensores',
 } as const
 
