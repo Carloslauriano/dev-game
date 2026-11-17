@@ -1,6 +1,6 @@
 import type { Challenge, ExecutionResult, Star } from './types'
 
-const ACTION_CALL = /\b(move|turnLeft|turnRight|pickUp)\s*\(/g
+const ACTION_CALL = /\b(move|turnLeft|turnRight|pickUp|andar|virarEsquerda|virarDireita|pegar)\s*\(/g
 
 /** Conta as instruções do programa: chamadas de Ação no texto, ignorando comentários. */
 export function countInstructions(code: string): number {

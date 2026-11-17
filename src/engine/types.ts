@@ -17,7 +17,7 @@ export type Challenge = {
   hint?: string
 }
 
-export type Language = 'javascript' | 'python'
+export type Language = 'javascript' | 'python' | 'portugol'
 
 export type Action = 'move' | 'turnLeft' | 'turnRight' | 'pickUp'
 
