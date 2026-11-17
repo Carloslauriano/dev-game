@@ -1,6 +1,7 @@
 import type { Concept } from '../engine/concepts'
 import type { Challenge } from '../engine/types'
 import { firstChallenge } from './first'
+import { conceito2ById } from './conceito2'
 import { conceito4 } from './conceito4'
 import { conceito1Challenges } from './conceito1'
 
@@ -22,6 +23,7 @@ export const concepts: Concept[] = [
 /** Desafios com conteúdo, por id. Os demais aparecem como "em breve". */
 export const playableChallenges: Record<string, Challenge> = {
   [firstChallenge.id]: firstChallenge,
+  ...conceito2ById,
   ...Object.fromEntries(conceito4.map((c) => [c.id, c])),
   ...Object.fromEntries(conceito1Challenges.map((c) => [c.id, c])),
 }
