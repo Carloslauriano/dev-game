@@ -47,3 +47,26 @@ export function Board({ challenge, frame }: { challenge: Challenge; frame: Frame
     </div>
   )
 }
+
+/** Legenda do mapa: só lista o que existe neste Desafio. */
+export function Legend({ challenge }: { challenge: Challenge }) {
+  const entries = [
+    { symbol: '▲', bg: '#1b1b2f', label: t('characterAria') },
+    { symbol: '⚑', bg: '#1d6b3a', label: t('goalAria') },
+    ...(challenge.items.length ? [{ symbol: '★', bg: '#1b1b2f', label: t('itemAria') }] : []),
+    ...(challenge.walls.length ? [{ symbol: '▒', bg: '#555', label: t('wallAria') }] : []),
+    ...(challenge.obstacles.length ? [{ symbol: '✖', bg: '#7a1d1d', label: t('obstacleAria') }] : []),
+  ]
+  return (
+    <ul aria-label={t('legend')} style={{ listStyle: 'none', padding: 0, margin: '8px 0', display: 'flex', flexWrap: 'wrap', gap: '4px 16px' }}>
+      {entries.map((e) => (
+        <li key={e.label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span aria-hidden style={{ width: 24, height: 24, background: e.bg, border: '1px solid #333', color: '#ffd23f', display: 'grid', placeItems: 'center' }}>
+            {e.symbol}
+          </span>
+          {e.label}
+        </li>
+      ))}
+    </ul>
+  )
+}

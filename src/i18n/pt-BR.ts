@@ -33,6 +33,7 @@ export const ptBR = {
   wallAria: 'parede',
   obstacleAria: 'obstáculo',
   characterAria: 'personagem',
+  legend: 'Legenda',
   starsLabel: 'Estrelas',
   starSolved: 'resolveu o Desafio',
   starFewInstructions: 'poucas instruções',

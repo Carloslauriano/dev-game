@@ -8,7 +8,7 @@ import { t, type TextKey } from '../i18n/pt-BR'
 import { failureText } from '../i18n/failureText'
 import { BlocksEditor } from './BlocksEditor'
 import { generateCode, type BlocklyState } from '../blocks/generators'
-import { Board, CELL } from './Board'
+import { Board, CELL, Legend } from './Board'
 import { offersBlocks, rememberBlockCode, migratedCodeFor } from './editorMode'
 import { playableChallenges } from '../challenges/concepts'
 import { Stars } from './Stars'
@@ -147,6 +147,7 @@ export function App({ challengeId, language, onLanguageChange, codes, onCodesCha
       <section aria-label={t('challenge')} style={{ flex: '0 0 auto', width: Math.max(280, challenge.width * CELL), maxWidth: '100%' }}>
       <h2>{t('challenge')}</h2>
       <Board challenge={challenge} frame={frames[index]} />
+      <Legend challenge={challenge} />
       <p role="status">{message}</p>
       <Stars earned={earned} />
       {challenge.hint && (
