@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { runChallenge } from './runChallenge'
 import { inProcessWorker } from './inProcessWorker'
-import type { Challenge } from './types'
+import type { Challenge, Language } from './types'
 
 // Mapa 3x1: personagem em (0,0) virado para leste, meta em (2,0).
 const corredor: Challenge = {
@@ -16,7 +16,7 @@ const corredor: Challenge = {
 }
 
 // Vitest roda em Node, sem Web Worker: o seam recebe a fábrica de worker.
-const run = (challenge: Challenge, language: 'javascript', code: string) =>
+const run = (challenge: Challenge, language: Language, code: string) =>
   runChallenge(challenge, language, code, inProcessWorker)
 
 describe('runChallenge (JavaScript)', () => {

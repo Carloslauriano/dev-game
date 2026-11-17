@@ -13,7 +13,7 @@ export type Challenge = {
   items: Position[]
 }
 
-export type Language = 'javascript'
+export type Language = 'javascript' | 'python'
 
 export type Action = 'move' | 'turnLeft' | 'turnRight' | 'pickUp'
 
@@ -25,7 +25,7 @@ export type RunResult = {
   reason?: string
 }
 
-export type WorkerRequest = { challenge: Challenge; code: string }
+export type WorkerRequest = { challenge: Challenge; language: Language; code: string }
 
 /** Contrato mínimo de um Web Worker, para permitir injeção em testes. */
 export interface WorkerLike {

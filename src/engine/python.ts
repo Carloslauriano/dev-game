@@ -1,0 +1,59 @@
+import type { Challenge, RunResult } from './types'
+import { execute } from './execute'
+
+type Pyodide = {
+  runPython(code: string): unknown
+  globals: { set(name: string, value: unknown): void }
+}
+
+declare const WorkerGlobalScope: unknown
+
+let pyodide: Promise<Pyodide> | undefined
+
+/** Carrega o Pyodide uma única vez, na primeira execução de Python. */
+function loadPyodide(): Promise<Pyodide> {
+  pyodide ??= import('pyodide').then(({ loadPyodide, version }) => {
+    // No navegador os arquivos WASM vêm do CDN; em Node o pacote npm os encontra sozinho.
+    const inBrowser = typeof WorkerGlobalScope !== 'undefined' || typeof window !== 'undefined'
+    return loadPyodide(
+      inBrowser ? { indexURL: `https://cdn.jsdelivr.net/pyodide/v${version}/full/` } : {},
+    ) as Promise<Pyodide>
+  })
+  return pyodide
+}
+
+const NAMES = ['move', 'turnLeft', 'turnRight', 'pickUp']
+
+/**
+ * Roda Python reaproveitando a simulação do JavaScript: o `execute` chama uma
+ * ponte global que expõe as Ações (move, turnLeft...) ao Python e roda o código.
+ * Assim as regras do mapa e a gravação são idênticas nas duas Linguagens.
+ */
+export async function executePython(challenge: Challenge, code: string): Promise<RunResult> {
+  const py = await loadPyodide()
+  const g = globalThis as Record<string, unknown>
+  g.__runPython = (...fns: Array<() => void>) => {
+    let gameFailure: unknown
+    NAMES.forEach((name, i) =>
+      py.globals.set(name, () => {
+        try {
+          fns[i]()
+        } catch (e) {
+          gameFailure = e // o Python embrulha exceções do JS; guardamos a original
+          throw e
+        }
+      }),
+    )
+    try {
+      py.runPython(code)
+    } catch (e) {
+      if (gameFailure) throw gameFailure
+      throw new Error((e as Error).message.trim().split('\n').pop())
+    }
+  }
+  try {
+    return execute(challenge, `__runPython(${NAMES.join(', ')})`)
+  } finally {
+    delete g.__runPython
+  }
+}

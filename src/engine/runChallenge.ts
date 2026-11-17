@@ -13,9 +13,6 @@ export function runChallenge(
   code: string,
   createWorker: () => WorkerLike = browserWorker,
 ): Promise<RunResult> {
-  if (language !== 'javascript') {
-    return Promise.reject(new Error(`Linguagem não suportada: ${language}`))
-  }
   return new Promise((resolve, reject) => {
     const worker = createWorker()
     worker.onmessage = (event) => {
@@ -26,6 +23,6 @@ export function runChallenge(
       worker.terminate()
       reject(new Error(event.message ?? 'erro no worker'))
     }
-    worker.postMessage({ challenge, code })
+    worker.postMessage({ challenge, language, code })
   })
 }
