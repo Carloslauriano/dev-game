@@ -76,6 +76,7 @@ describe('Portugol: erros de sintaxe em português com linha', () => {
     const r = await run('andar()\nse (naMeta() {\n}')
     expect(r.status).toBe('failed')
     expect(r.actions).toEqual([])
-    expect(r.reason).toMatch(/Erro de sintaxe.*linha 2/)
+    expect(r.reason?.code).toBe('portugolSyntax')
+    expect(r.reason?.params?.line).toBe(2)
   })
 })

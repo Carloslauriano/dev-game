@@ -13,7 +13,7 @@ export async function dispatch({ challenge, language, code }: WorkerRequest): Pr
       return execute(challenge, compilePortugol(code))
     } catch (e) {
       if (e instanceof PortugolError) {
-        return { status: 'failed', actions: [], reason: `Erro de sintaxe no Portugol, ${e.message}` }
+        return { status: 'failed', actions: [], reason: { code: 'portugolSyntax', params: { line: e.line, detail: e.detail } } }
       }
       throw e
     }

@@ -25,7 +25,7 @@ export function runChallenge(
         status: 'failed',
         actions: [],
         stars: [],
-        reason: 'Seu programa demorou demais e foi interrompido. Será que tem um loop infinito?',
+        reason: { code: 'timeout' },
       })
     }, timeoutMs)
     worker.onmessage = (event) => {

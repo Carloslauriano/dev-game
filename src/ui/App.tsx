@@ -6,6 +6,7 @@ import { firstChallenge } from '../challenges/first'
 import { languageName, starterFor } from '../languages'
 import { LanguagePicker } from './LanguagePicker'
 import { t } from '../i18n/pt-BR'
+import { failureText } from '../i18n/failureText'
 import { BlocksEditor } from './BlocksEditor'
 import { generateCode } from '../blocks/generators'
 import { Board } from './Board'
@@ -69,7 +70,7 @@ export function App({ challengeId }: { challengeId?: string }) {
       setMessage('')
       setPlaying(true)
     } catch (e) {
-      reset(t('failed', { reason: (e as Error).message }))
+      reset(t('failed', { reason: failureText({ code: 'runtimeError' }) }))
     }
   }
 
@@ -86,7 +87,7 @@ export function App({ challengeId }: { challengeId?: string }) {
         setEarned(saveStars(challenge.id, r.stars))
       } else {
         // Falhar reinicia o Desafio sem punição.
-        reset(t('failed', { reason: r?.reason ?? '' }))
+        reset(t('failed', { reason: failureText(r?.reason) }))
       }
       return
     }

@@ -29,6 +29,7 @@ describe('runChallenge (JavaScript)', () => {
   it('falha ao bater em parede, inclusive a borda do mapa', async () => {
     const result = await run(corredor, 'javascript', 'turnLeft(); move();')
     expect(result.status).toBe('failed')
+    expect(result.reason).toEqual({ code: 'hitWall' })
     expect(result.actions).toEqual(['turnLeft', 'move'])
   })
 
@@ -36,6 +37,7 @@ describe('runChallenge (JavaScript)', () => {
     const comBuraco: Challenge = { ...corredor, obstacles: [{ x: 1, y: 0 }] }
     const result = await run(comBuraco, 'javascript', 'move(); move();')
     expect(result.status).toBe('failed')
+    expect(result.reason).toEqual({ code: 'hitObstacle' })
     expect(result.actions).toEqual(['move'])
   })
 
@@ -48,6 +50,7 @@ describe('runChallenge (JavaScript)', () => {
   it('falha se o programa termina fora da meta', async () => {
     const result = await run(corredor, 'javascript', 'move();')
     expect(result.status).toBe('failed')
+    expect(result.reason).toEqual({ code: 'goalNotReached' })
   })
 
   it('suporta virar à direita e pegar', async () => {
@@ -67,20 +70,28 @@ describe('runChallenge (JavaScript)', () => {
   it('falha ao pegar onde não há item', async () => {
     const result = await run(corredor, 'javascript', 'pickUp();')
     expect(result.status).toBe('failed')
+    expect(result.reason).toEqual({ code: 'noItem' })
   })
 
   it('interrompe loop infinito de Ações com mensagem amigável', async () => {
     const result = await run(corredor, 'javascript', 'while (true) { turnLeft(); }')
     expect(result.status).toBe('failed')
-    expect(result.reason).toMatch(/limite de ações/i)
+    expect(result.reason).toEqual({ code: 'actionLimit', params: { limit: 1000 } })
     expect(result.actions.length).toBeLessThanOrEqual(1001)
   })
 
-  it('mostra erro de sintaxe em português', async () => {
+  it('devolve motivo de erro de sintaxe, sem texto do navegador', async () => {
     const result = await run(corredor, 'javascript', 'move(; move()')
     expect(result.status).toBe('failed')
-    expect(result.reason).toMatch(/^Erro de sintaxe/)
+    expect(result.reason).toEqual({ code: 'syntaxUnexpected' })
     expect(result.actions).toEqual([])
+    const aberto = await run(corredor, 'javascript', 'move(')
+    expect(aberto.reason?.code).toBe('syntaxUnclosed')
+  })
+
+  it('erro de execução vira motivo sem texto em inglês', async () => {
+    const result = await run(corredor, 'javascript', 'andarr()')
+    expect(result.reason).toEqual({ code: 'undefinedName', params: { name: 'andarr' } })
   })
 
   it('interrompe loop sem Ações pelo tempo limite e libera a interface', async () => {
@@ -95,7 +106,7 @@ describe('runChallenge (JavaScript)', () => {
     })
     const result = await runChallenge(corredor, 'javascript', 'while(true){}', travado, 20)
     expect(result.status).toBe('failed')
-    expect(result.reason).toMatch(/demorou demais/i)
+    expect(result.reason).toEqual({ code: 'timeout' })
     expect(terminated).toBe(true)
   })
 })

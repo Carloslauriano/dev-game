@@ -63,7 +63,7 @@ describe('contrato entre Linguagens', () => {
     const py = await run('python', 'move(\n')
     expect(py.status).toBe('failed')
     expect(py.actions).toEqual([])
-    expect(py.reason).toMatch(/erro no código/)
+    expect(py.reason).toEqual({ code: 'syntaxUnclosed' })
   }, 60_000)
 
   it('sensores têm os mesmos nomes e valores em JavaScript e Python', async () => {

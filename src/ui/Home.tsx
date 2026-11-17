@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { unlockedFlags, solvedCount } from '../engine/concepts'
+import { unlockedFlags, solvedCount, UNLOCK_THRESHOLD } from '../engine/concepts'
 import { concepts, playableChallenges } from '../challenges/concepts'
 import { t, type TextKey } from '../i18n/pt-BR'
 import { App } from './App'
@@ -65,7 +65,7 @@ export function Home() {
             <small>
               {flags[i]
                 ? `${solvedCount(c, isSolved)}/${c.challengeIds.length}`
-                : t('locked', { previous: t(`concept_${concepts[i - 1].id}` as TextKey) })}
+                : t('locked', { previous: t(`concept_${concepts[i - 1].id}` as TextKey), needed: String(UNLOCK_THRESHOLD), total: String(concepts[i - 1].challengeIds.length) })}
             </small>
           </h3>
           {flags[i] && (
