@@ -20,6 +20,9 @@ export const ptBR = {
   starSolved: 'resolveu o Desafio',
   starFewInstructions: 'poucas instruções',
   starNoHint: 'sem Dica',
+  hintButton: 'Pedir Dica',
+  hintWarning: 'Pedir uma Dica custa uma Estrela (a de resolver sem Dica). Quer pedir mesmo assim?',
+  hintLabel: 'Dica',
 } as const
 
 export type TextKey = keyof typeof ptBR

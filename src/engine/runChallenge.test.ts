@@ -114,13 +114,13 @@ describe('runChallenge: Estrelas', () => {
   it('resolver com poucas instruções dá mais uma Estrela', async () => {
     const limitado = { ...corredor, maxInstructions: 2 }
     const result = await run(limitado, 'javascript', 'move(); move();')
-    expect(result.stars).toEqual(['solved', 'fewInstructions'])
+    expect(result.stars).toEqual(['solved', 'fewInstructions', 'noHint'])
   })
 
   it('resolver com instruções demais não dá a Estrela de economia', async () => {
     const limitado = { ...corredor, maxInstructions: 1 }
     const result = await run(limitado, 'javascript', 'move(); move();')
-    expect(result.stars).toEqual(['solved'])
+    expect(result.stars).toEqual(['solved', 'noHint'])
   })
 
   it('comentários e texto fora de chamadas não contam como instruções', async () => {
@@ -128,5 +128,10 @@ describe('runChallenge: Estrelas', () => {
     const code = '// move(); move(); move();\nmove(); move();'
     const result = await run(limitado, 'javascript', code)
     expect(result.stars).toContain('fewInstructions')
+  })
+
+  it('pedir Dica remove a Estrela de sem Dica', async () => {
+    const result = await runChallenge(corredor, 'javascript', 'move(); move();', inProcessWorker, 3000, true)
+    expect(result.stars).toEqual(['solved'])
   })
 })

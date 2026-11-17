@@ -14,6 +14,7 @@ export function runChallenge(
   code: string,
   createWorker: () => WorkerLike = browserWorker,
   timeoutMs = 3000,
+  hintUsed = false,
 ): Promise<RunResult> {
   if (language !== 'javascript') {
     return Promise.reject(new Error(`Linguagem não suportada: ${language}`))
@@ -34,7 +35,7 @@ export function runChallenge(
       clearTimeout(timer)
       worker.terminate()
       const result = event.data
-      resolve({ ...result, stars: computeStars(challenge, result, code) })
+      resolve({ ...result, stars: computeStars(challenge, result, code, hintUsed) })
     }
     worker.onerror = (event) => {
       clearTimeout(timer)

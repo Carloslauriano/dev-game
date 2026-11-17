@@ -7,9 +7,9 @@ const SLOTS: { star: Star; label: TextKey }[] = [
   { star: 'noHint', label: 'starNoHint' },
 ]
 
-/** Estrelas do Desafio. Mostra só as Estrelas disponíveis (sem Dica ainda não existe). */
+/** Estrelas do Desafio: resolver, poucas instruções e sem Dica. */
 export function Stars({ earned }: { earned: Star[] }) {
-  const slots = SLOTS.filter((s) => s.star !== 'noHint')
+  const slots = SLOTS
   return (
     <p aria-label={`${t('starsLabel')}: ${earned.length}`}>
       {t('starsLabel')}:{' '}

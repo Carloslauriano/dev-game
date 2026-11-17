@@ -11,6 +11,7 @@ export const firstChallenge: Challenge = {
   obstacles: [{ x: 3, y: 2 }],
   items: [{ x: 1, y: 2 }],
   maxInstructions: 13,
+  hint: 'Dica de exemplo: a parede bloqueia o caminho reto. Que tal contorná-la por baixo?',
 }
 
 export const starterCode = `// Chegue à meta usando move(), turnLeft(), turnRight() e pickUp()
