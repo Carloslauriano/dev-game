@@ -130,7 +130,7 @@ export function App({ challengeId, language, onLanguageChange, codes, onCodesCha
   }
 
   return (
-    <main style={{ fontFamily: 'monospace', padding: 16, maxWidth: 960 }}>
+    <main style={{ fontFamily: 'monospace', padding: 16, maxWidth: 1280 }}>
       <h1>{t('title')}</h1>
       <details>
         <summary>{t('settings')}</summary>
@@ -142,6 +142,8 @@ export function App({ challengeId, language, onLanguageChange, codes, onCodesCha
           }}
         />
       </details>
+      <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+      <section aria-label={t('challenge')} style={{ flex: '0 0 auto', maxWidth: '100%' }}>
       <h2>{t('challenge')}</h2>
       <Board challenge={challenge} frame={frames[index]} />
       <p role="status">{message}</p>
@@ -153,6 +155,8 @@ export function App({ challengeId, language, onLanguageChange, codes, onCodesCha
           <button onClick={askHint} title={t('hintWarning')}>{t('hintButton')}</button>
         )
       )}
+      </section>
+      <section aria-label={t('editorCode')} style={{ flex: '1 1 480px', minWidth: 0 }}>
       {!introDone && language && (
         <section role="note" aria-label={t('migrationTitle')}>
           <h3>{t('migrationTitle')}</h3>
@@ -172,11 +176,9 @@ export function App({ challengeId, language, onLanguageChange, codes, onCodesCha
         ))}
       </div>}
       {mode === 'blocks' ? (
-        <div style={{ display: 'flex', gap: 8 }}>
-          <div style={{ flex: 2 }}>
-            <BlocksEditor initialState={blockState} onChange={setBlockState} />
-          </div>
-          <label style={{ flex: 1 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <BlocksEditor initialState={blockState} onChange={setBlockState} />
+          <label>
             {t('generatedCode', { language: languageName(language) })}
             <pre style={{ margin: 0 }}>{blockCode}</pre>
           </label>
@@ -209,6 +211,8 @@ export function App({ challengeId, language, onLanguageChange, codes, onCodesCha
             onChange={(e) => setSpeed(Number(e.target.value))}
           />
         </label>
+      </div>
+      </section>
       </div>
     </main>
   )

@@ -56,6 +56,7 @@ export const ptBR = {
   editorMode: 'Modo de edição',
   generatedCode: 'Código equivalente ({language})',
   blocksAria: 'Área de blocos',
+  block_start: 'quando começar',
   block_move: 'andar',
   block_turnLeft: 'virar à esquerda',
   block_turnRight: 'virar à direita',

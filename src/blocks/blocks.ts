@@ -1,6 +1,7 @@
 import * as Blockly from 'blockly/core'
 import { t } from '../i18n/pt-BR'
 
+const START_COLOUR = 160
 const ACTION_COLOUR = 210
 const LOOP_COLOUR = 120
 const LOGIC_COLOUR = 40
@@ -28,6 +29,8 @@ export function defineBlocks(): void {
   if (defined) return
   defined = true
   Blockly.common.defineBlocksWithJsonArray([
+    // Ponto de partida do programa: só os blocos encaixados abaixo dele são executados.
+    { type: 'start', message0: t('block_start'), nextStatement: null, colour: START_COLOUR },
     action('action_move', t('block_move')),
     action('action_turn_left', t('block_turnLeft')),
     action('action_turn_right', t('block_turnRight')),

@@ -79,3 +79,18 @@ describe('Blocos visuais geram código equivalente', () => {
     expect(generateCode(state, 'javascript')).toContain('move();')
   })
 })
+
+describe('bloco de início', () => {
+  const withStart = (...bs: B[]) => ({
+    blocks: { languageVersion: 0, blocks: [{ type: 'start', next: { block: seq(...bs) } }, { ...move, x: 200, y: 200 }] },
+  })
+
+  it.each(languages)('só roda o que está encaixado no início (%s)', async (language) => {
+    const r = await solve(corredor, withStart(move, move), language)
+    expect(r).toMatchObject({ status: 'solved', actions: ['move', 'move'] })
+  })
+
+  it('programa só com o início gera código vazio', () => {
+    expect(generateCode({ blocks: { languageVersion: 0, blocks: [{ type: 'start' }] } }, 'python')).toBe('')
+  })
+})

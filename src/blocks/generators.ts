@@ -100,6 +100,7 @@ function makeGenerator(language: Language): Gen {
     return code + (next && !thisOnly ? gen.blockToCode(next) : '')
   }
   const forBlock = gen.forBlock as Record<string, Emit>
+  forBlock.start = () => '' // o scrub_ encadeia os blocos de baixo
   const { falseLiteral } = syntax
 
   for (const [type, name] of Object.entries(ACTION_TYPES)) forBlock[type] = () => `${syntax.name(name)}()${syntax.terminator}\n`
@@ -133,6 +134,9 @@ export function generateCode(state: BlocklyState, language: Language): string {
 export function generateFromWorkspace(workspace: Blockly.Workspace, language: Language): string {
   const gen = (generators[language] ??= makeGenerator(language))
   gen.init(workspace)
-  const tops = workspace.getTopBlocks(true).filter((b) => !!b.previousConnection)
+  const all = workspace.getTopBlocks(true)
+  // Com bloco de início, só o que está encaixado nele roda; sem ele (programas antigos), toda pilha solta roda.
+  const starts = all.filter((b) => b.type === 'start')
+  const tops = starts.length ? starts : all.filter((b) => !!b.previousConnection)
   return tops.map((b) => gen.blockToCode(b) as string).join('')
 }

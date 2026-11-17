@@ -15,6 +15,12 @@ export function BlocksEditor({ initialState, onChange }: { initialState: object 
     Blockly.setLocale(PtBr as unknown as Record<string, string>)
     const workspace = Blockly.inject(host.current!, { toolbox, trashcan: true })
     if (initialState) Blockly.serialization.workspaces.load(initialState, workspace)
+    // Todo programa nasce com o bloco de início (fixo, não pode ser apagado).
+    if (!workspace.getTopBlocks(false).some((b) => b.type === 'start')) {
+      Blockly.serialization.blocks.append({ type: 'start', x: 24, y: 24, deletable: false }, workspace)
+    }
+    // Blocos soltos (fora do início) ficam desativados: não rodam.
+    workspace.addChangeListener(Blockly.Events.disableOrphans)
     const listener = (e: Blockly.Events.Abstract) => {
       if (e.isUiEvent) return
       onChangeRef.current(Blockly.serialization.workspaces.save(workspace))
