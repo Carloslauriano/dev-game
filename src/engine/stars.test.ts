@@ -23,6 +23,14 @@ describe('computeStars e Dica', () => {
   })
 })
 
+describe('contagem de instruções em Portugol', () => {
+  it('conta Ações em português e ignora comentários', () => {
+    const limitado = { ...desafio, maxInstructions: 2 }
+    expect(computeStars(limitado, resolvido, 'andar()\nandar() // pegar()', false)).toContain('fewInstructions')
+    expect(computeStars(limitado, resolvido, 'andar()\nandar()\nvirarEsquerda()', false)).not.toContain('fewInstructions')
+  })
+})
+
 describe('mergeStars', () => {
   it('refazer com resultado pior não remove Estrelas já ganhas', () => {
     expect(mergeStars(['solved', 'fewInstructions'], ['solved'])).toEqual(['solved', 'fewInstructions'])

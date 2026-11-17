@@ -32,6 +32,18 @@ describe('contrato entre Linguagens', () => {
     expect(py).toEqual(js)
   }, 60_000)
 
+  it('Portugol, Python e JavaScript equivalentes dão a mesma gravação e resultado', async () => {
+    const js = await run('javascript', jsSolucao)
+    const pt = await run('portugol', 'andar()\npegar()\nandar()\nvirarDireita()\nandar()\n')
+    expect(pt).toEqual(js)
+    const corredor: Challenge = { ...mapa, goal: { x: 2, y: 0 }, items: [] }
+    const jsLoop = await run('javascript', 'while (!atGoal()) { if (pathClear()) move(); }', corredor)
+    const ptLoop = await run('portugol', 'enquanto (nao naMeta()) {\n se (caminhoLivre()) { andar() }\n}', corredor)
+    expect(ptLoop).toEqual(jsLoop)
+    const ptFalha = await run('portugol', 'virarEsquerda()\nandar()')
+    expect(ptFalha).toEqual(await run('javascript', 'turnLeft(); move();'))
+  })
+
   it('Python com loop dá a mesma gravação que o JavaScript', async () => {
     const corredor: Challenge = { ...mapa, goal: { x: 2, y: 0 }, items: [] }
     const js = await run('javascript', 'for (let i = 0; i < 2; i++) move();', corredor)
