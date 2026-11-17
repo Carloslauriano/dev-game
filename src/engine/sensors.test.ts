@@ -50,7 +50,7 @@ describe('Sensores (JavaScript)', () => {
     const comItem: Challenge = { ...corredor, items: [{ x: 1, y: 0 }] }
     const sem = await run(comItem, 'move(); move();')
     expect(sem.status).toBe('failed')
-    expect(sem.reason).toMatch(/item/)
+    expect(sem.reason).toMatch(/iten/)
     const com = await run(comItem, 'move(); pickUp(); move();')
     expect(com).toEqual({ status: 'solved', actions: ['move', 'pickUp', 'move'] })
   })
