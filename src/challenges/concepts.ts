@@ -18,7 +18,7 @@ export const concepts: Concept[] = [
   { id: 'repeticao', challengeIds: slots('repeticao') },
   { id: 'condicao', challengeIds: slots('condicao') },
   { id: 'repeticao-condicao', challengeIds: slots('repeticao-condicao') },
-  { id: 'variaveis', challengeIds: slots('variaveis') },
+  { id: 'variaveis', challengeIds: slots('variaveis'), typedCodeOnly: true },
 ]
 
 /** Desafios com conteúdo, por id. Os demais aparecem como "em breve". */

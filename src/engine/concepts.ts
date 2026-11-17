@@ -1,5 +1,10 @@
 /** Conceito: grupo de Desafios (por id) que ensina uma ideia de lógica. Dados puros. */
-export type Concept = { id: string; challengeIds: string[] }
+export type Concept = {
+  id: string
+  challengeIds: string[]
+  /** A partir deste Conceito o jogador só escreve código digitado (sem Blocos visuais). */
+  typedCodeOnly?: boolean
+}
 
 /** Desafios resolvidos do Conceito anterior que abrem o seguinte. */
 export const UNLOCK_THRESHOLD = 3
@@ -22,4 +27,11 @@ export function isConceptUnlocked(concepts: Concept[], index: number, isSolved: 
 
 export function unlockedFlags(concepts: Concept[], isSolved: IsSolved): boolean[] {
   return concepts.map((_, i) => isConceptUnlocked(concepts, i, isSolved))
+}
+
+/** Blocos visuais são oferecidos até o Conceito anterior ao primeiro `typedCodeOnly`. Desafio fora dos Conceitos mantém Blocos. */
+export function offersBlocks(concepts: Concept[], challengeId: string): boolean {
+  const own = concepts.findIndex((c) => c.challengeIds.includes(challengeId))
+  if (own < 0) return true
+  return !concepts.slice(0, own + 1).some((c) => c.typedCodeOnly)
 }

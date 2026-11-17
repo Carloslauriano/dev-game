@@ -34,7 +34,7 @@ export function App({ challengeId, language, onLanguageChange, codes, onCodesCha
   const [introDone, setIntroDone] = useState(blocksOffered)
   const [mode, setMode] = useState<'blocks' | 'code'>(blocksOffered ? 'blocks' : 'code')
   const [blockState, setBlockState] = useState<BlocklyState | null>(null)
-  // No modo Blocos o código é o equivalente gerado na Linguagem escolhida.
+  // No modo Blocos visuais o código é o equivalente gerado na Linguagem escolhida.
   const blockCode = useMemo(
     () => (language && blockState ? generateCode(blockState, language) : ''),
     [language, blockState],
