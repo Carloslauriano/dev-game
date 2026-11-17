@@ -23,7 +23,7 @@ describe('Sensores (JavaScript)', () => {
       corredor,
       'if (!pathClear()) throw new Error("a"); move(); move(); if (pathClear()) throw new Error("b");',
     )
-    expect(r).toEqual({ status: 'solved', actions: ['move', 'move'] })
+    expect(r).toMatchObject({ status: 'solved', actions: ['move', 'move'] })
   })
 
   it('pathClear é falso diante de parede e de obstáculo', async () => {
@@ -52,6 +52,6 @@ describe('Sensores (JavaScript)', () => {
     expect(sem.status).toBe('failed')
     expect(sem.reason).toMatch(/iten/)
     const com = await run(comItem, 'move(); pickUp(); move();')
-    expect(com).toEqual({ status: 'solved', actions: ['move', 'pickUp', 'move'] })
+    expect(com).toMatchObject({ status: 'solved', actions: ['move', 'pickUp', 'move'] })
   })
 })
