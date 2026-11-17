@@ -1,5 +1,7 @@
 import type { Concept } from '../engine/concepts'
+import type { Challenge } from '../engine/types'
 import { firstChallenge } from './first'
+import { conceito2ById } from './conceito2'
 
 /**
  * Os 5 Conceitos, na ordem de desbloqueio. Cada um tem 5 Desafios; os ids ainda sem
@@ -17,4 +19,7 @@ export const concepts: Concept[] = [
 ]
 
 /** Desafios com conteúdo, por id. Os demais aparecem como "em breve". */
-export const playableChallenges = { [firstChallenge.id]: firstChallenge }
+export const playableChallenges: Record<string, Challenge> = {
+  [firstChallenge.id]: firstChallenge,
+  ...conceito2ById,
+}
