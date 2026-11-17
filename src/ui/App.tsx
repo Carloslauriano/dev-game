@@ -33,6 +33,7 @@ export function App({ challengeId, language, onLanguageChange, codes, onCodesCha
   const initialFrame = (): Frame => replay(challenge, [])[0]
   const [introDone, setIntroDone] = useState(blocksOffered)
   const [mode, setMode] = useState<'blocks' | 'code'>(blocksOffered ? 'blocks' : 'code')
+  const [blocksTab, setBlocksTab] = useState<'workspace' | 'generated'>('workspace')
   const [blockState, setBlockState] = useState<BlocklyState | null>(null)
   // No modo Blocos visuais o código é o equivalente gerado na Linguagem escolhida.
   const blockCode = useMemo(
@@ -177,11 +178,30 @@ export function App({ challengeId, language, onLanguageChange, codes, onCodesCha
       </div>}
       {mode === 'blocks' ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <BlocksEditor initialState={blockState} onChange={setBlockState} />
-          <label>
-            {t('generatedCode', { language: languageName(language) })}
+          <div role="tablist" style={{ display: 'flex', gap: 8 }}>
+            {(['workspace', 'generated'] as const).map((tab) => (
+              <button
+                key={tab}
+                role="tab"
+                aria-selected={blocksTab === tab}
+                onClick={() => {
+                  setBlocksTab(tab)
+                  // O Blockly mede a área ao ficar visível de novo.
+                  if (tab === 'workspace') setTimeout(() => window.dispatchEvent(new Event('resize')), 0)
+                }}
+              >
+                {blocksTab === tab ? '● ' : ''}
+                {tab === 'workspace' ? t('blocksTab') : t('generatedCode', { language: languageName(language) })}
+              </button>
+            ))}
+          </div>
+          {/* O editor continua montado (só escondido) para não perder o programa ao trocar de aba. */}
+          <div role="tabpanel" hidden={blocksTab !== 'workspace'}>
+            <BlocksEditor initialState={blockState} onChange={setBlockState} />
+          </div>
+          <div role="tabpanel" hidden={blocksTab !== 'generated'}>
             <pre style={{ margin: 0 }}>{blockCode}</pre>
-          </label>
+          </div>
         </div>
       ) : (
         <label>

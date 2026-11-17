@@ -55,6 +55,7 @@ export const ptBR = {
   editorCode: 'Código',
   editorMode: 'Modo de edição',
   generatedCode: 'Código equivalente ({language})',
+  blocksTab: 'Blocos',
   blocksAria: 'Área de blocos',
   block_start: 'quando começar',
   block_move: 'andar',
