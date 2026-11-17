@@ -2,7 +2,11 @@
 export const ptBR = {
   title: 'Dev Game',
   challenge: 'Desafio',
-  codeLabel: 'Seu código (JavaScript)',
+  codeLabel: 'Seu código ({language})',
+  languageLabel: 'Linguagem',
+  chooseLanguage: 'Escolha a Linguagem para jogar',
+  settings: 'Configurações',
+  comingSoon: 'em breve',
   run: 'Executar',
   pause: 'Pausar',
   resume: 'Continuar',

@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { runChallenge } from '../engine/runChallenge'
 import { replay, type Frame } from '../engine/replay'
-import type { RunResult } from '../engine/types'
-import { firstChallenge, starterCode } from '../challenges/first'
+import type { Language, RunResult } from '../engine/types'
+import { firstChallenge } from '../challenges/first'
+import { languageName, starterFor } from '../languages'
+import { LanguagePicker } from './LanguagePicker'
 import { t } from '../i18n/pt-BR'
 import { Board } from './Board'
 
@@ -11,7 +13,11 @@ const initialFrame = (): Frame => replay(challenge, [])[0]
 const BASE_MS = 600
 
 export function App() {
-  const [code, setCode] = useState(starterCode)
+  const [language, setLanguage] = useState<Language | null>(null)
+  // O código é guardado por Linguagem: trocar de Linguagem não perde o que foi escrito.
+  const [codes, setCodes] = useState<Partial<Record<Language, string>>>({})
+  const code = language ? (codes[language] ?? starterFor(language)) : ''
+  const setCode = (c: string) => language && setCodes((prev) => ({ ...prev, [language]: c }))
   const [frames, setFrames] = useState<Frame[]>([initialFrame()])
   const [index, setIndex] = useState(0)
   const [playing, setPlaying] = useState(false)
@@ -34,7 +40,7 @@ export function App() {
     setBusy(true)
     setMessage(t('running'))
     try {
-      const r = await runChallenge(challenge, 'javascript', code)
+      const r = await runChallenge(challenge, language!, code)
       result.current = r
       setFrames(replay(challenge, r.actions))
       setIndex(0)
@@ -67,14 +73,34 @@ export function App() {
 
   const canPause = busy && frames.length > 1 && !finished
 
+  if (!language) {
+    return (
+      <main style={{ fontFamily: 'monospace', padding: 16, maxWidth: 720 }}>
+        <h1>{t('title')}</h1>
+        <h2>{t('chooseLanguage')}</h2>
+        <LanguagePicker value={null} onChange={setLanguage} />
+      </main>
+    )
+  }
+
   return (
     <main style={{ fontFamily: 'monospace', padding: 16, maxWidth: 720 }}>
       <h1>{t('title')}</h1>
+      <details>
+        <summary>{t('settings')}</summary>
+        <LanguagePicker
+          value={language}
+          onChange={(l) => {
+            reset()
+            setLanguage(l)
+          }}
+        />
+      </details>
       <h2>{t('challenge')}</h2>
       <Board challenge={challenge} frame={frames[index]} />
       <p role="status">{message}</p>
       <label>
-        {t('codeLabel')}
+        {t('codeLabel', { language: languageName(language) })}
         <textarea
           value={code}
           onChange={(e) => setCode(e.target.value)}

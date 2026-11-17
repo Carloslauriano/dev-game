@@ -1,10 +1,7 @@
+import type { PyodideAPI as Pyodide } from 'pyodide'
 import type { Challenge, RunResult } from './types'
 import { execute } from './execute'
 
-type Pyodide = {
-  runPython(code: string): unknown
-  globals: { set(name: string, value: unknown): void }
-}
 
 declare const WorkerGlobalScope: unknown
 
@@ -17,7 +14,7 @@ function loadPyodide(): Promise<Pyodide> {
     const inBrowser = typeof WorkerGlobalScope !== 'undefined' || typeof window !== 'undefined'
     return loadPyodide(
       inBrowser ? { indexURL: `https://cdn.jsdelivr.net/pyodide/v${version}/full/` } : {},
-    ) as Promise<Pyodide>
+    )
   })
   return pyodide
 }
