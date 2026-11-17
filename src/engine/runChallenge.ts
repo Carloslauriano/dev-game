@@ -1,3 +1,4 @@
+import { computeStars } from './stars'
 import type { Challenge, Language, RunResult, WorkerLike } from './types'
 
 const browserWorker = (): WorkerLike =>
@@ -20,7 +21,8 @@ export function runChallenge(
     const worker = createWorker()
     worker.onmessage = (event) => {
       worker.terminate()
-      resolve(event.data)
+      const result = event.data
+      resolve({ ...result, stars: computeStars(challenge, result, code) })
     }
     worker.onerror = (event) => {
       worker.terminate()

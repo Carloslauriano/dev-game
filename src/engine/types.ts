@@ -11,11 +11,16 @@ export type Challenge = {
   walls: Position[]
   obstacles: Position[]
   items: Position[]
+  /** Limite de instruções para ganhar a Estrela de economia. Ausente: sem essa Estrela. */
+  maxInstructions?: number
 }
 
 export type Language = 'javascript'
 
 export type Action = 'move' | 'turnLeft' | 'turnRight' | 'pickUp'
+
+/** Estrelas de um Desafio. 'noHint' (sem Dica) entra com as Dicas, no ticket #10. */
+export type Star = 'solved' | 'fewInstructions' | 'noHint'
 
 export type RunResult = {
   status: 'solved' | 'failed'
@@ -23,6 +28,8 @@ export type RunResult = {
   actions: Action[]
   /** Motivo da falha, quando status é 'failed'. */
   reason?: string
+  /** Estrelas ganhas nesta execução. */
+  stars: Star[]
 }
 
 export type WorkerRequest = { challenge: Challenge; code: string }

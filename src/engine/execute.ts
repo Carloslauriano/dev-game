@@ -60,10 +60,10 @@ export function execute(challenge: Challenge, code: string): RunResult {
       api.pickUp,
     )
   } catch (e) {
-    if (e instanceof Failure) return { status: 'failed', actions, reason: e.message }
-    return { status: 'failed', actions, reason: `erro no código: ${(e as Error).message}` }
+    if (e instanceof Failure) return { status: 'failed', actions, reason: e.message, stars: [] }
+    return { status: 'failed', actions, reason: `erro no código: ${(e as Error).message}`, stars: [] }
   }
 
-  if (x === challenge.goal.x && y === challenge.goal.y) return { status: 'solved', actions }
-  return { status: 'failed', actions, reason: 'o personagem não chegou à meta' }
+  if (x === challenge.goal.x && y === challenge.goal.y) return { status: 'solved', actions, stars: [] }
+  return { status: 'failed', actions, reason: 'o personagem não chegou à meta', stars: [] }
 }

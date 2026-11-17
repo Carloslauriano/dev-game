@@ -22,7 +22,8 @@ const run = (challenge: Challenge, language: 'javascript', code: string) =>
 describe('runChallenge (JavaScript)', () => {
   it('resolve o Desafio e devolve a gravação de Ações', async () => {
     const result = await run(corredor, 'javascript', 'move(); move();')
-    expect(result).toEqual({ status: 'solved', actions: ['move', 'move'] })
+    expect(result.status).toBe('solved')
+    expect(result.actions).toEqual(['move', 'move'])
   })
 
   it('falha ao bater em parede, inclusive a borda do mapa', async () => {
@@ -59,14 +60,43 @@ describe('runChallenge (JavaScript)', () => {
     }
     const code = 'move(); pickUp(); turnRight(); move();'
     const result = await run(mapa, 'javascript', code)
-    expect(result).toEqual({
-      status: 'solved',
-      actions: ['move', 'pickUp', 'turnRight', 'move'],
-    })
+    expect(result.status).toBe('solved')
+    expect(result.actions).toEqual(['move', 'pickUp', 'turnRight', 'move'])
   })
 
   it('falha ao pegar onde não há item', async () => {
     const result = await run(corredor, 'javascript', 'pickUp();')
     expect(result.status).toBe('failed')
+  })
+})
+
+describe('runChallenge: Estrelas', () => {
+  it('resolver dá a Estrela de resolução', async () => {
+    const result = await run(corredor, 'javascript', 'move(); move();')
+    expect(result.stars).toContain('solved')
+  })
+
+  it('falhar não dá Estrelas', async () => {
+    const result = await run(corredor, 'javascript', 'move();')
+    expect(result.stars).toEqual([])
+  })
+
+  it('resolver com poucas instruções dá mais uma Estrela', async () => {
+    const limitado = { ...corredor, maxInstructions: 2 }
+    const result = await run(limitado, 'javascript', 'move(); move();')
+    expect(result.stars).toEqual(['solved', 'fewInstructions'])
+  })
+
+  it('resolver com instruções demais não dá a Estrela de economia', async () => {
+    const limitado = { ...corredor, maxInstructions: 1 }
+    const result = await run(limitado, 'javascript', 'move(); move();')
+    expect(result.stars).toEqual(['solved'])
+  })
+
+  it('comentários e texto fora de chamadas não contam como instruções', async () => {
+    const limitado = { ...corredor, maxInstructions: 2 }
+    const code = '// move(); move(); move();\nmove(); move();'
+    const result = await run(limitado, 'javascript', code)
+    expect(result.stars).toContain('fewInstructions')
   })
 })
