@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { runChallenge } from './runChallenge'
 import { inProcessWorker } from './inProcessWorker'
-import type { Challenge, Language } from './types'
+import type { Challenge, Language, WorkerLike } from './types'
 
 // Mapa 3x1: personagem em (0,0) virado para leste, meta em (2,0).
 const corredor: Challenge = {
@@ -144,5 +144,51 @@ describe('runChallenge: Estrelas', () => {
   it('pedir Dica remove a Estrela de sem Dica', async () => {
     const result = await runChallenge(corredor, 'javascript', 'move(); move();', inProcessWorker, 3000, true)
     expect(result.stars).toEqual(['solved'])
+  })
+})
+
+describe('runChallenge: reaproveitamento do worker de Python', () => {
+  const countingFactory = () => {
+    const state = { created: 0, terminated: 0, hangNext: false }
+    const create = (): WorkerLike => {
+      state.created++
+      if (state.hangNext) {
+        state.hangNext = false
+        return { onmessage: null, onerror: null, postMessage() {}, terminate: () => void state.terminated++ }
+      }
+      const w = inProcessWorker()
+      w.terminate = () => void state.terminated++
+      return w
+    }
+    return { state, create }
+  }
+
+  it('duas execuções de Python usam o mesmo worker (Pyodide carrega uma vez)', async () => {
+    const { state, create } = countingFactory()
+    const a = await runChallenge(corredor, 'python', 'move()\nmove()\n', create)
+    const b = await runChallenge(corredor, 'python', 'move()\nmove()\n', create)
+    expect(a.status).toBe('solved')
+    expect(b.status).toBe('solved')
+    expect(state.created).toBe(1)
+    expect(state.terminated).toBe(0)
+  }, 60_000)
+
+  it('o tempo limite encerra o worker reaproveitado e a próxima execução cria outro', async () => {
+    const { state, create } = countingFactory()
+    state.hangNext = true
+    const travou = await runChallenge(corredor, 'python', 'while True: pass', create, 20)
+    expect(travou.reason).toEqual({ code: 'timeout' })
+    expect(state.terminated).toBe(1)
+    const depois = await runChallenge(corredor, 'python', 'move()\nmove()\n', create)
+    expect(depois.status).toBe('solved')
+    expect(state.created).toBe(2)
+  }, 60_000)
+
+  it('JavaScript continua com um worker por execução', async () => {
+    const { state, create } = countingFactory()
+    await runChallenge(corredor, 'javascript', 'move(); move();', create)
+    await runChallenge(corredor, 'javascript', 'move(); move();', create)
+    expect(state.created).toBe(2)
+    expect(state.terminated).toBe(2)
   })
 })
