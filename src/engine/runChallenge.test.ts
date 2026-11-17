@@ -69,4 +69,34 @@ describe('runChallenge (JavaScript)', () => {
     const result = await run(corredor, 'javascript', 'pickUp();')
     expect(result.status).toBe('failed')
   })
+
+  it('interrompe loop infinito de Ações com mensagem amigável', async () => {
+    const result = await run(corredor, 'javascript', 'while (true) { turnLeft(); }')
+    expect(result.status).toBe('failed')
+    expect(result.reason).toMatch(/limite de ações/i)
+    expect(result.actions.length).toBeLessThanOrEqual(1001)
+  })
+
+  it('mostra erro de sintaxe em português', async () => {
+    const result = await run(corredor, 'javascript', 'move(; move()')
+    expect(result.status).toBe('failed')
+    expect(result.reason).toMatch(/^Erro de sintaxe/)
+    expect(result.actions).toEqual([])
+  })
+
+  it('interrompe loop sem Ações pelo tempo limite e libera a interface', async () => {
+    let terminated = false
+    const travado = () => ({
+      onmessage: null,
+      onerror: null,
+      postMessage() {},
+      terminate() {
+        terminated = true
+      },
+    })
+    const result = await runChallenge(corredor, 'javascript', 'while(true){}', travado, 20)
+    expect(result.status).toBe('failed')
+    expect(result.reason).toMatch(/demorou demais/i)
+    expect(terminated).toBe(true)
+  })
 })
