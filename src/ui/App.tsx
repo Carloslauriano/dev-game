@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { runChallenge } from '../engine/runChallenge'
 import { replay, type Frame } from '../engine/replay'
 import type { Language, RunResult } from '../engine/types'
@@ -6,6 +6,8 @@ import { firstChallenge } from '../challenges/first'
 import { languageName, starterFor } from '../languages'
 import { LanguagePicker } from './LanguagePicker'
 import { t } from '../i18n/pt-BR'
+import { BlocksEditor } from './BlocksEditor'
+import { generateCode } from '../blocks/generators'
 import { Board } from './Board'
 import { Stars } from './Stars'
 import { loadStars, saveStars } from './progress'
@@ -19,7 +21,15 @@ export function App() {
   const [language, setLanguage] = useState<Language | null>(null)
   // O código é guardado por Linguagem: trocar de Linguagem não perde o que foi escrito.
   const [codes, setCodes] = useState<Partial<Record<Language, string>>>({})
-  const code = language ? (codes[language] ?? starterFor(language)) : ''
+  const [mode, setMode] = useState<'blocks' | 'code'>('blocks')
+  const [blockState, setBlockState] = useState<object | null>(null)
+  // No modo Blocos o código é o equivalente gerado na Linguagem escolhida.
+  const blockCode = useMemo(
+    () => (language && blockState ? generateCode(blockState, language) : ''),
+    [language, blockState],
+  )
+  const typedCode = language ? (codes[language] ?? starterFor(language)) : ''
+  const code = mode === 'blocks' ? blockCode : typedCode
   const setCode = (c: string) => language && setCodes((prev) => ({ ...prev, [language]: c }))
   const [frames, setFrames] = useState<Frame[]>([initialFrame()])
   const [index, setIndex] = useState(0)
@@ -86,7 +96,7 @@ export function App() {
 
   if (!language) {
     return (
-      <main style={{ fontFamily: 'monospace', padding: 16, maxWidth: 720 }}>
+      <main style={{ fontFamily: 'monospace', padding: 16, maxWidth: 960 }}>
         <h1>{t('title')}</h1>
         <h2>{t('chooseLanguage')}</h2>
         <LanguagePicker value={null} onChange={setLanguage} />
@@ -95,7 +105,7 @@ export function App() {
   }
 
   return (
-    <main style={{ fontFamily: 'monospace', padding: 16, maxWidth: 720 }}>
+    <main style={{ fontFamily: 'monospace', padding: 16, maxWidth: 960 }}>
       <h1>{t('title')}</h1>
       <details>
         <summary>{t('settings')}</summary>
@@ -118,15 +128,35 @@ export function App() {
           <button onClick={askHint} title={t('hintWarning')}>{t('hintButton')}</button>
         )
       )}
-      <label>
-        {t('codeLabel', { language: languageName(language) })}
-        <textarea
-          value={code}
-          onChange={(e) => setCode(e.target.value)}
-          rows={10}
-          style={{ display: 'block', width: '100%', fontFamily: 'monospace' }}
-        />
-      </label>
+      <div role="radiogroup" aria-label={t('editorMode')} style={{ display: 'flex', gap: 8 }}>
+        {(['blocks', 'code'] as const).map((m) => (
+          <button key={m} role="radio" aria-checked={mode === m} onClick={() => setMode(m)}>
+            {mode === m ? '● ' : ''}
+            {m === 'blocks' ? t('editorBlocks') : t('editorCode')}
+          </button>
+        ))}
+      </div>
+      {mode === 'blocks' ? (
+        <div style={{ display: 'flex', gap: 8 }}>
+          <div style={{ flex: 2 }}>
+            <BlocksEditor initialState={blockState} onChange={setBlockState} />
+          </div>
+          <label style={{ flex: 1 }}>
+            {t('generatedCode', { language: languageName(language) })}
+            <pre style={{ margin: 0 }}>{blockCode}</pre>
+          </label>
+        </div>
+      ) : (
+        <label>
+          {t('codeLabel', { language: languageName(language) })}
+          <textarea
+            value={typedCode}
+            onChange={(e) => setCode(e.target.value)}
+            rows={10}
+            style={{ display: 'block', width: '100%', fontFamily: 'monospace' }}
+          />
+        </label>
+      )}
       <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 8 }}>
         <button onClick={run} disabled={busy}>{t('run')}</button>
         <button onClick={() => setPlaying((p) => !p)} disabled={!canPause}>
