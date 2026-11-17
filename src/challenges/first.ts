@@ -10,6 +10,7 @@ export const firstChallenge: Challenge = {
   walls: [{ x: 2, y: 0 }, { x: 2, y: 1 }],
   obstacles: [{ x: 3, y: 2 }],
   items: [{ x: 1, y: 2 }],
+  maxInstructions: 13,
 }
 
 export const starterCode = `// Chegue à meta usando move(), turnLeft(), turnRight() e pickUp()

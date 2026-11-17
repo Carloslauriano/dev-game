@@ -1,5 +1,5 @@
 import type { PyodideAPI as Pyodide } from 'pyodide'
-import type { Challenge, RunResult } from './types'
+import type { Challenge, ExecutionResult } from './types'
 import { execute } from './execute'
 
 
@@ -19,22 +19,22 @@ function loadPyodide(): Promise<Pyodide> {
   return pyodide
 }
 
-const NAMES = ['move', 'turnLeft', 'turnRight', 'pickUp']
+const NAMES = ['move', 'turnLeft', 'turnRight', 'pickUp', 'pathClear', 'hasItem', 'atGoal']
 
 /**
  * Roda Python reaproveitando a simulação do JavaScript: o `execute` chama uma
  * ponte global que expõe as Ações (move, turnLeft...) ao Python e roda o código.
  * Assim as regras do mapa e a gravação são idênticas nas duas Linguagens.
  */
-export async function executePython(challenge: Challenge, code: string): Promise<RunResult> {
+export async function executePython(challenge: Challenge, code: string): Promise<ExecutionResult> {
   const py = await loadPyodide()
   const g = globalThis as Record<string, unknown>
-  g.__runPython = (...fns: Array<() => void>) => {
+  g.__runPython = (...fns: Array<() => unknown>) => {
     let gameFailure: unknown
     NAMES.forEach((name, i) =>
       py.globals.set(name, () => {
         try {
-          fns[i]()
+          return fns[i]()
         } catch (e) {
           gameFailure = e // o Python embrulha exceções do JS; guardamos a original
           throw e

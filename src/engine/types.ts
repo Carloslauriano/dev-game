@@ -11,11 +11,16 @@ export type Challenge = {
   walls: Position[]
   obstacles: Position[]
   items: Position[]
+  /** Limite de instruções para ganhar a Estrela de economia. Ausente: sem essa Estrela. */
+  maxInstructions?: number
 }
 
 export type Language = 'javascript' | 'python'
 
 export type Action = 'move' | 'turnLeft' | 'turnRight' | 'pickUp'
+
+/** Estrelas de um Desafio. 'noHint' (sem Dica) entra com as Dicas, no ticket #10. */
+export type Star = 'solved' | 'fewInstructions' | 'noHint'
 
 export type RunResult = {
   status: 'solved' | 'failed'
@@ -23,13 +28,18 @@ export type RunResult = {
   actions: Action[]
   /** Motivo da falha, quando status é 'failed'. */
   reason?: string
+  /** Estrelas ganhas nesta execução. */
+  stars: Star[]
 }
+
+/** Resultado do worker, antes de o seam calcular as Estrelas. */
+export type ExecutionResult = Omit<RunResult, 'stars'>
 
 export type WorkerRequest = { challenge: Challenge; language: Language; code: string }
 
 /** Contrato mínimo de um Web Worker, para permitir injeção em testes. */
 export interface WorkerLike {
-  onmessage: ((event: { data: RunResult }) => void) | null
+  onmessage: ((event: { data: ExecutionResult }) => void) | null
   onerror: ((event: { message?: string }) => void) | null
   postMessage(message: WorkerRequest): void
   terminate(): void

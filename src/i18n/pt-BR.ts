@@ -20,6 +20,10 @@ export const ptBR = {
   wallAria: 'parede',
   obstacleAria: 'obstáculo',
   characterAria: 'personagem',
+  starsLabel: 'Estrelas',
+  starSolved: 'resolveu o Desafio',
+  starFewInstructions: 'poucas instruções',
+  starNoHint: 'sem Dica',
 } as const
 
 export type TextKey = keyof typeof ptBR

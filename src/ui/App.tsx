@@ -7,6 +7,9 @@ import { languageName, starterFor } from '../languages'
 import { LanguagePicker } from './LanguagePicker'
 import { t } from '../i18n/pt-BR'
 import { Board } from './Board'
+import { Stars } from './Stars'
+import { loadStars, saveStars } from './progress'
+import type { Star } from '../engine/types'
 
 const challenge = firstChallenge
 const initialFrame = (): Frame => replay(challenge, [])[0]
@@ -24,6 +27,7 @@ export function App() {
   const [busy, setBusy] = useState(false)
   const [speed, setSpeed] = useState(1)
   const [message, setMessage] = useState('')
+  const [earned, setEarned] = useState<Star[]>(() => loadStars(challenge.id))
   const result = useRef<RunResult | null>(null)
 
   const reset = (msg = '') => {
@@ -61,6 +65,7 @@ export function App() {
       if (r?.status === 'solved') {
         setBusy(false)
         setMessage(t('solved'))
+        setEarned(saveStars(challenge.id, r.stars))
       } else {
         // Falhar reinicia o Desafio sem punição.
         reset(t('failed', { reason: r?.reason ?? '' }))
@@ -99,6 +104,7 @@ export function App() {
       <h2>{t('challenge')}</h2>
       <Board challenge={challenge} frame={frames[index]} />
       <p role="status">{message}</p>
+      <Stars earned={earned} />
       <label>
         {t('codeLabel', { language: languageName(language) })}
         <textarea

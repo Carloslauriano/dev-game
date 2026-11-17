@@ -28,6 +28,7 @@ describe('contrato entre Linguagens', () => {
     expect(js).toEqual({
       status: 'solved',
       actions: ['move', 'pickUp', 'move', 'turnRight', 'move'],
+      stars: ['solved'],
     })
     expect(py).toEqual(js)
   }, 60_000)
@@ -52,5 +53,13 @@ describe('contrato entre Linguagens', () => {
     expect(py.status).toBe('failed')
     expect(py.actions).toEqual([])
     expect(py.reason).toMatch(/erro no código/)
+  }, 60_000)
+
+  it('sensores têm os mesmos nomes e valores em JavaScript e Python', async () => {
+    const corredor: Challenge = { ...mapa, goal: { x: 2, y: 0 }, items: [] }
+    const js = await run('javascript', 'while (!atGoal()) { if (pathClear()) move(); }', corredor)
+    const py = await run('python', 'while not atGoal():\n    if pathClear():\n        move()\n', corredor)
+    expect(js.status).toBe('solved')
+    expect(py).toEqual(js)
   }, 60_000)
 })

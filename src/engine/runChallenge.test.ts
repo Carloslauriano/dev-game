@@ -22,7 +22,8 @@ const run = (challenge: Challenge, language: Language, code: string) =>
 describe('runChallenge (JavaScript)', () => {
   it('resolve o Desafio e devolve a gravação de Ações', async () => {
     const result = await run(corredor, 'javascript', 'move(); move();')
-    expect(result).toEqual({ status: 'solved', actions: ['move', 'move'] })
+    expect(result.status).toBe('solved')
+    expect(result.actions).toEqual(['move', 'move'])
   })
 
   it('falha ao bater em parede, inclusive a borda do mapa', async () => {
@@ -59,14 +60,73 @@ describe('runChallenge (JavaScript)', () => {
     }
     const code = 'move(); pickUp(); turnRight(); move();'
     const result = await run(mapa, 'javascript', code)
-    expect(result).toEqual({
-      status: 'solved',
-      actions: ['move', 'pickUp', 'turnRight', 'move'],
-    })
+    expect(result.status).toBe('solved')
+    expect(result.actions).toEqual(['move', 'pickUp', 'turnRight', 'move'])
   })
 
   it('falha ao pegar onde não há item', async () => {
     const result = await run(corredor, 'javascript', 'pickUp();')
     expect(result.status).toBe('failed')
+  })
+
+  it('interrompe loop infinito de Ações com mensagem amigável', async () => {
+    const result = await run(corredor, 'javascript', 'while (true) { turnLeft(); }')
+    expect(result.status).toBe('failed')
+    expect(result.reason).toMatch(/limite de ações/i)
+    expect(result.actions.length).toBeLessThanOrEqual(1001)
+  })
+
+  it('mostra erro de sintaxe em português', async () => {
+    const result = await run(corredor, 'javascript', 'move(; move()')
+    expect(result.status).toBe('failed')
+    expect(result.reason).toMatch(/^Erro de sintaxe/)
+    expect(result.actions).toEqual([])
+  })
+
+  it('interrompe loop sem Ações pelo tempo limite e libera a interface', async () => {
+    let terminated = false
+    const travado = () => ({
+      onmessage: null,
+      onerror: null,
+      postMessage() {},
+      terminate() {
+        terminated = true
+      },
+    })
+    const result = await runChallenge(corredor, 'javascript', 'while(true){}', travado, 20)
+    expect(result.status).toBe('failed')
+    expect(result.reason).toMatch(/demorou demais/i)
+    expect(terminated).toBe(true)
+  })
+})
+
+describe('runChallenge: Estrelas', () => {
+  it('resolver dá a Estrela de resolução', async () => {
+    const result = await run(corredor, 'javascript', 'move(); move();')
+    expect(result.stars).toContain('solved')
+  })
+
+  it('falhar não dá Estrelas', async () => {
+    const result = await run(corredor, 'javascript', 'move();')
+    expect(result.stars).toEqual([])
+  })
+
+  it('resolver com poucas instruções dá mais uma Estrela', async () => {
+    const limitado = { ...corredor, maxInstructions: 2 }
+    const result = await run(limitado, 'javascript', 'move(); move();')
+    expect(result.stars).toEqual(['solved', 'fewInstructions'])
+  })
+
+  it('resolver com instruções demais não dá a Estrela de economia', async () => {
+    const limitado = { ...corredor, maxInstructions: 1 }
+    const result = await run(limitado, 'javascript', 'move(); move();')
+    expect(result.stars).toEqual(['solved'])
+  })
+
+  it('comentários e texto fora de chamadas não contam como instruções', async () => {
+    const limitado = { ...corredor, maxInstructions: 2 }
+    const code = '// move(); move(); move();\nmove(); move();'
+    const result = await run(limitado, 'javascript', code)
+    expect(result.stars).toContain('fewInstructions')
   })
 })
