@@ -40,7 +40,7 @@ export function Home() {
         <ul style={{ listStyle: 'none', padding: 0 }}>
           {difficulties.map((d) => (
             <li key={d.id} style={{ marginBottom: 8 }}>
-              <button disabled={!d.available} onClick={() => setScreen({ name: 'concepts' })}>
+              <button className={d.id === 'challenger' ? 'challenger-name' : undefined} disabled={!d.available} onClick={() => setScreen({ name: 'concepts' })}>
                 {t(d.label)}
               </button>
               {!d.available && <small> ({t('comingSoon')})</small>}
@@ -56,7 +56,7 @@ export function Home() {
   return (
     <main style={{ fontFamily: 'monospace', padding: 16, maxWidth: 720 }}>
       <h1>{t('title')}</h1>
-      <h2>{t('difficultyChallenger')}</h2>
+      <h2 className="challenger-name">{t('difficultyChallenger')}</h2>
       <button onClick={() => setScreen({ name: 'difficulty' })}>{t('back')}</button>
       {concepts.map((c, i) => (
         <section key={c.id} aria-label={t(`concept_${c.id}` as TextKey)} style={{ opacity: flags[i] ? 1 : 0.5 }}>

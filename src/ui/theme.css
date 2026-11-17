@@ -1,0 +1,98 @@
+/* Tema de arcade: puramente visual, não afeta regras de Desafio. */
+:root {
+  --arcade-bg: #0b0b1e;
+  --arcade-panel: #14143a;
+  --arcade-red: #e6192e;
+  --arcade-yellow: #ffd23f;
+  --arcade-blue: #2ec4ff;
+}
+
+body {
+  margin: 0;
+  color: #f4f4ff;
+  background:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 3px),
+    radial-gradient(ellipse at top, #24245e 0%, var(--arcade-bg) 70%);
+  min-height: 100vh;
+}
+
+#root main {
+  margin: 0 auto;
+}
+
+#root h1 {
+  color: var(--arcade-yellow);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  text-shadow: 3px 3px 0 var(--arcade-red);
+}
+
+#root h2,
+#root h3 {
+  color: var(--arcade-blue);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Nome da Dificuldade no estilo "Here Comes a New Challenger": itálico, caixa alta, vermelho com contorno amarelo. */
+.challenger-name {
+  font-style: italic;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: var(--arcade-red) !important;
+  -webkit-text-stroke: 1px var(--arcade-yellow);
+  text-shadow: 3px 3px 0 #000;
+  letter-spacing: 0.05em;
+}
+
+button {
+  font-family: inherit;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--arcade-yellow);
+  background: var(--arcade-panel);
+  border: 2px solid var(--arcade-yellow);
+  border-radius: 2px;
+  padding: 6px 12px;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 var(--arcade-red);
+}
+
+button:hover:not(:disabled),
+button:focus-visible {
+  background: var(--arcade-red);
+  color: #fff;
+  outline: none;
+}
+
+button:active:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--arcade-red);
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+button.challenger-name {
+  background: var(--arcade-panel);
+  font-size: 1.1em;
+}
+
+textarea {
+  color: #d6ffd6;
+  background: #05050f;
+  border: 2px solid var(--arcade-blue);
+}
+
+[role='status'] {
+  color: var(--arcade-yellow);
+  min-height: 1.2em;
+}
+
+[role='note'] {
+  border-left: 4px solid var(--arcade-red);
+  padding-left: 8px;
+}
