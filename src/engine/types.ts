@@ -13,13 +13,15 @@ export type Challenge = {
   items: Position[]
   /** Limite de instruções para ganhar a Estrela de economia. Ausente: sem essa Estrela. */
   maxInstructions?: number
+  /** Texto da Dica. O conteúdo final fica em issue à parte. */
+  hint?: string
 }
 
 export type Language = 'javascript'
 
 export type Action = 'move' | 'turnLeft' | 'turnRight' | 'pickUp'
 
-/** Estrelas de um Desafio. 'noHint' (sem Dica) entra com as Dicas, no ticket #10. */
+/** Estrelas de um Desafio. 'noHint' é perdida ao pedir uma Dica. */
 export type Star = 'solved' | 'fewInstructions' | 'noHint'
 
 export type RunResult = {

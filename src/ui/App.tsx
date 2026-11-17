@@ -22,6 +22,7 @@ export function App() {
   const [speed, setSpeed] = useState(1)
   const [message, setMessage] = useState('')
   const [earned, setEarned] = useState<Star[]>(() => loadStars(challenge.id))
+  const [hintShown, setHintShown] = useState(false)
   const result = useRef<RunResult | null>(null)
 
   const reset = (msg = '') => {
@@ -38,7 +39,7 @@ export function App() {
     setBusy(true)
     setMessage(t('running'))
     try {
-      const r = await runChallenge(challenge, 'javascript', code)
+      const r = await runChallenge(challenge, 'javascript', code, undefined, undefined, hintShown)
       result.current = r
       setFrames(replay(challenge, r.actions))
       setIndex(0)
@@ -70,6 +71,11 @@ export function App() {
     return () => clearTimeout(id)
   }, [playing, index, finished, speed])
 
+  const askHint = () => {
+    // O custo é avisado antes; a Dica fica visível pelo resto da sessão do Desafio.
+    if (window.confirm(t('hintWarning'))) setHintShown(true)
+  }
+
   const canPause = busy && frames.length > 1 && !finished
 
   return (
@@ -79,6 +85,13 @@ export function App() {
       <Board challenge={challenge} frame={frames[index]} />
       <p role="status">{message}</p>
       <Stars earned={earned} />
+      {challenge.hint && (
+        hintShown ? (
+          <p role="note"><strong>{t('hintLabel')}:</strong> {challenge.hint}</p>
+        ) : (
+          <button onClick={askHint} title={t('hintWarning')}>{t('hintButton')}</button>
+        )
+      )}
       <label>
         {t('codeLabel')}
         <textarea
