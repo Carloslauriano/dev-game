@@ -2,6 +2,9 @@ import * as Blockly from 'blockly/core'
 import type { Language } from '../engine/types'
 import { defineBlocks } from './blocks'
 
+/** Programa de Blocos serializado (JSON do Blockly). */
+export type BlocklyState = object
+
 type Gen = Blockly.CodeGenerator
 type Emit = (block: Blockly.Block, gen: Gen) => string | [string, number]
 
@@ -105,7 +108,7 @@ function makeGenerator(language: Language): Gen {
 const generators: Partial<Record<Language, Gen>> = {}
 
 /** Gera o código da Linguagem a partir de um programa de Blocos serializado (JSON do Blockly). Função pura. */
-export function generateCode(state: object, language: Language): string {
+export function generateCode(state: BlocklyState, language: Language): string {
   defineBlocks()
   const workspace = new Blockly.Workspace()
   try {

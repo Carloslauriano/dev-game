@@ -12,7 +12,7 @@ export const conceito1Challenges: Challenge[] = [
     obstacles: [],
     items: [],
     maxInstructions: 3,
-    hint: 'O personagem já olha para a meta. Cada move() dá um passo: quantos passos faltam?',
+    hint: 'hint_sequencia-1',
   },
   {
     id: 'sequencia-2',
@@ -24,7 +24,7 @@ export const conceito1Challenges: Challenge[] = [
     obstacles: [],
     items: [],
     maxInstructions: 5,
-    hint: 'Ande até o canto, vire para baixo com turnRight() e ande de novo.',
+    hint: 'hint_sequencia-2',
   },
   {
     id: 'sequencia-3',
@@ -36,7 +36,7 @@ export const conceito1Challenges: Challenge[] = [
     obstacles: [],
     items: [{ x: 3, y: 0 }],
     maxInstructions: 7,
-    hint: 'Há um item no caminho: use pickUp() quando estiver em cima dele, antes de seguir para a meta.',
+    hint: 'hint_sequencia-3',
   },
   {
     id: 'sequencia-4',
@@ -48,7 +48,7 @@ export const conceito1Challenges: Challenge[] = [
     obstacles: [],
     items: [],
     maxInstructions: 10,
-    hint: 'A parede bloqueia o caminho reto. Suba, contorne por cima e desça de novo até a linha da meta.',
+    hint: 'hint_sequencia-4',
   },
   {
     id: 'sequencia-5',
@@ -60,6 +60,6 @@ export const conceito1Challenges: Challenge[] = [
     obstacles: [{ x: 4, y: 1 }, { x: 3, y: 3 }],
     items: [{ x: 0, y: 0 }, { x: 2, y: 2 }],
     maxInstructions: 17,
-    hint: 'Pegue os dois itens em ordem, sem pisar nos buracos. Planeje o trajeto inteiro antes de escrever.',
+    hint: 'hint_sequencia-5',
   },
 ]

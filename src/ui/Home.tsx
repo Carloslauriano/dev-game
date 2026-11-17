@@ -4,6 +4,8 @@ import { concepts, playableChallenges } from '../challenges/concepts'
 import { t, type TextKey } from '../i18n/pt-BR'
 import { App } from './App'
 import { loadStars } from './progress'
+import { loadLanguage, saveLanguage } from './settings'
+import type { Language } from '../engine/types'
 
 const difficulties: { id: string; label: TextKey; available: boolean }[] = [
   { id: 'challenger', label: 'difficultyChallenger', available: true },
@@ -18,6 +20,13 @@ type Screen = { name: 'difficulty' } | { name: 'concepts' } | { name: 'play'; ch
 /** Fluxo: Dificuldade -> Conceitos -> Desafio. */
 export function Home() {
   const [screen, setScreen] = useState<Screen>({ name: 'difficulty' })
+  // Linguagem e código digitado vivem aqui: sobrevivem a Voltar e à troca de Desafio.
+  const [language, setLanguageState] = useState<Language | null>(loadLanguage)
+  const [codes, setCodes] = useState<Record<string, Partial<Record<Language, string>>>>({})
+  const setLanguage = (l: Language) => {
+    saveLanguage(l)
+    setLanguageState(l)
+  }
 
   if (screen.name === 'play') {
     return (
@@ -25,7 +34,14 @@ export function Home() {
         <button onClick={() => setScreen({ name: 'concepts' })} style={{ margin: 16 }}>
           {t('back')}
         </button>
-        <App challengeId={screen.challengeId} />
+        <App
+          key={screen.challengeId}
+          challengeId={screen.challengeId}
+          language={language}
+          onLanguageChange={setLanguage}
+          codes={codes[screen.challengeId] ?? {}}
+          onCodesChange={(next) => setCodes((prev) => ({ ...prev, [screen.challengeId]: next }))}
+        />
       </>
     )
   }

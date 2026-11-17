@@ -18,7 +18,7 @@ export const conceito5: Challenge[] = [
     obstacles: [],
     items: [],
     maxInstructions: 1,
-    hint: 'Crie uma variável com o número de passos (5) e repita move() essa quantidade de vezes.',
+    hint: 'hint_variaveis-1',
   },
   {
     // Mesma variável usada nos dois lados de um L.
@@ -31,7 +31,7 @@ export const conceito5: Challenge[] = [
     obstacles: [],
     items: [],
     maxInstructions: 3,
-    hint: 'Os dois lados têm o mesmo tamanho: guarde-o em uma variável e use-a nas duas repetições.',
+    hint: 'hint_variaveis-2',
   },
   {
     // Contar os passos até a parede e reusar a contagem.
@@ -44,7 +44,7 @@ export const conceito5: Challenge[] = [
     obstacles: [],
     items: [],
     maxInstructions: 3,
-    hint: 'Comece com passos = 0 e some 1 a cada move() enquanto o caminho estiver livre. Depois reuse passos.',
+    hint: 'hint_variaveis-3',
   },
   {
     // Contar um lado e percorrer mais dois lados do mesmo tamanho.
@@ -57,7 +57,7 @@ export const conceito5: Challenge[] = [
     obstacles: [],
     items: [],
     maxInstructions: 3,
-    hint: 'Conte o primeiro lado numa variável; depois repita 2 vezes: virar à direita e andar essa contagem.',
+    hint: 'hint_variaveis-4',
   },
   {
     // Contador de itens coletados, reusado para decidir quantos passos dar no fim.
@@ -70,7 +70,7 @@ export const conceito5: Challenge[] = [
     obstacles: [],
     items: [{ x: 1, y: 0 }, { x: 3, y: 0 }, { x: 5, y: 0 }],
     maxInstructions: 4,
-    hint: 'Some 1 em uma variável a cada pickUp(). No fim do corredor, vire à direita e ande tantos passos quanto itens coletados.',
+    hint: 'hint_variaveis-5',
   },
 ]
 

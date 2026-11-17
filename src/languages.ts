@@ -1,25 +1,36 @@
 import type { Language } from './engine/types'
-import { starterCode as jsStarter } from './challenges/first'
 
-export const AVAILABLE_LANGUAGES: { id: Language; name: string }[] = [
-  { id: 'javascript', name: 'JavaScript' },
-  { id: 'python', name: 'Python' },
-  { id: 'portugol', name: 'Portugol' },
-]
+type LanguageInfo = { name: string; starter: string }
+
+/** Tudo o que a interface precisa saber de cada Linguagem, em um lugar só. */
+const LANGUAGES: Record<Language, LanguageInfo> = {
+  javascript: {
+    name: 'JavaScript',
+    starter: `// Chegue à meta usando move(), turnLeft(), turnRight() e pickUp()
+move()
+`,
+  },
+  python: {
+    name: 'Python',
+    starter: `# Chegue à meta usando move(), turnLeft(), turnRight() e pickUp()
+move()
+`,
+  },
+  portugol: {
+    name: 'Portugol',
+    starter: `// Chegue à meta usando andar(), virarEsquerda(), virarDireita() e pegar()
+andar()
+`,
+  },
+}
+
+export const AVAILABLE_LANGUAGES: { id: Language; name: string }[] = (Object.keys(LANGUAGES) as Language[]).map(
+  (id) => ({ id, name: LANGUAGES[id].name }),
+)
 
 /** Linguagens ainda não disponíveis, mostradas como "em breve". */
 export const COMING_SOON_LANGUAGES = ['C', 'Java', 'C++', 'Go', 'Rust']
 
-const pythonStarter = `# Chegue à meta usando move(), turnLeft(), turnRight() e pickUp()
-move()
-`
+export const starterFor = (language: Language): string => LANGUAGES[language].starter
 
-const portugolStarter = `// Chegue à meta usando andar(), virarEsquerda(), virarDireita() e pegar()
-andar()
-`
-
-export const starterFor = (language: Language): string =>
-  language === 'python' ? pythonStarter : language === 'portugol' ? portugolStarter : jsStarter
-
-export const languageName = (language: Language): string =>
-  AVAILABLE_LANGUAGES.find((l) => l.id === language)!.name
+export const languageName = (language: Language): string => LANGUAGES[language].name
