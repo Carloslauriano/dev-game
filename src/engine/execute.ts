@@ -23,6 +23,16 @@ export function execute(challenge: Challenge, code: string): RunResult {
     facing = ORDER[(ORDER.indexOf(facing) + step + 4) % 4]
   }
 
+  const sensors = {
+    pathClear: () => {
+      const next = { x: x + DELTA[facing].x, y: y + DELTA[facing].y }
+      const inside = next.x >= 0 && next.y >= 0 && next.x < challenge.width && next.y < challenge.height
+      return inside && !at(challenge.walls, next) && !at(challenge.obstacles, next)
+    },
+    hasItem: () => at(items, { x, y }),
+    atGoal: () => x === challenge.goal.x && y === challenge.goal.y,
+  }
+
   const api: Record<Action, () => void> = {
     move() {
       actions.push('move')
@@ -53,17 +63,23 @@ export function execute(challenge: Challenge, code: string): RunResult {
   }
 
   try {
-    new Function('move', 'turnLeft', 'turnRight', 'pickUp', code)(
+    new Function('move', 'turnLeft', 'turnRight', 'pickUp', 'pathClear', 'hasItem', 'atGoal', code)(
       api.move,
       api.turnLeft,
       api.turnRight,
       api.pickUp,
+      sensors.pathClear,
+      sensors.hasItem,
+      sensors.atGoal,
     )
   } catch (e) {
     if (e instanceof Failure) return { status: 'failed', actions, reason: e.message }
     return { status: 'failed', actions, reason: `erro no código: ${(e as Error).message}` }
   }
 
-  if (x === challenge.goal.x && y === challenge.goal.y) return { status: 'solved', actions }
+  if (sensors.atGoal()) {
+    if (items.length > 0) return { status: 'failed', actions, reason: 'faltou coletar itens' }
+    return { status: 'solved', actions }
+  }
   return { status: 'failed', actions, reason: 'o personagem não chegou à meta' }
 }
