@@ -1,3 +1,4 @@
+import { computeStars } from './stars'
 import type { Challenge, Language, RunResult, WorkerLike } from './types'
 
 const browserWorker = (): WorkerLike =>
@@ -25,13 +26,15 @@ export function runChallenge(
       resolve({
         status: 'failed',
         actions: [],
+        stars: [],
         reason: 'Seu programa demorou demais e foi interrompido. Será que tem um loop infinito?',
       })
     }, timeoutMs)
     worker.onmessage = (event) => {
       clearTimeout(timer)
       worker.terminate()
-      resolve(event.data)
+      const result = event.data
+      resolve({ ...result, stars: computeStars(challenge, result, code) })
     }
     worker.onerror = (event) => {
       clearTimeout(timer)

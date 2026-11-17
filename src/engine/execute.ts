@@ -1,4 +1,4 @@
-import type { Action, Challenge, Facing, Position, RunResult } from './types'
+import type { Action, Challenge, Facing, Position, ExecutionResult } from './types'
 
 const ORDER: Facing[] = ['north', 'east', 'south', 'west']
 const DELTA: Record<Facing, Position> = {
@@ -16,7 +16,7 @@ export const ACTION_LIMIT = 1000
 const at = (list: Position[], p: Position) => list.some((q) => q.x === p.x && q.y === p.y)
 
 /** Roda o código do jogador contra o mapa e grava as Ações. Não toca em DOM nem em globais do jogo. */
-export function execute(challenge: Challenge, code: string): RunResult {
+export function execute(challenge: Challenge, code: string): ExecutionResult {
   const actions: Action[] = []
   let { x, y } = challenge.start
   let facing = challenge.start.facing
