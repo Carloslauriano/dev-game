@@ -1,4 +1,4 @@
-import type { Challenge, RunResult, Star } from './types'
+import type { Challenge, ExecutionResult, Star } from './types'
 
 const ACTION_CALL = /\b(move|turnLeft|turnRight|pickUp)\s*\(/g
 
@@ -9,7 +9,7 @@ export function countInstructions(code: string): number {
 }
 
 /** Estrelas ganhas em uma execução. Falhar não dá Estrelas. */
-export function computeStars(challenge: Challenge, result: RunResult, code: string): Star[] {
+export function computeStars(challenge: Challenge, result: ExecutionResult, code: string): Star[] {
   if (result.status !== 'solved') return []
   const stars: Star[] = ['solved']
   if (challenge.maxInstructions !== undefined && countInstructions(code) <= challenge.maxInstructions) {

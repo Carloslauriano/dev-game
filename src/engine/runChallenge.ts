@@ -13,18 +13,31 @@ export function runChallenge(
   language: Language,
   code: string,
   createWorker: () => WorkerLike = browserWorker,
+  timeoutMs = 3000,
 ): Promise<RunResult> {
   if (language !== 'javascript') {
     return Promise.reject(new Error(`Linguagem não suportada: ${language}`))
   }
   return new Promise((resolve, reject) => {
     const worker = createWorker()
+    // Loop sem Ações trava o worker: o tempo limite o encerra e a interface segue livre.
+    const timer = setTimeout(() => {
+      worker.terminate()
+      resolve({
+        status: 'failed',
+        actions: [],
+        stars: [],
+        reason: 'Seu programa demorou demais e foi interrompido. Será que tem um loop infinito?',
+      })
+    }, timeoutMs)
     worker.onmessage = (event) => {
+      clearTimeout(timer)
       worker.terminate()
       const result = event.data
       resolve({ ...result, stars: computeStars(challenge, result, code) })
     }
     worker.onerror = (event) => {
+      clearTimeout(timer)
       worker.terminate()
       reject(new Error(event.message ?? 'erro no worker'))
     }

@@ -32,11 +32,14 @@ export type RunResult = {
   stars: Star[]
 }
 
+/** Resultado do worker, antes de o seam calcular as Estrelas. */
+export type ExecutionResult = Omit<RunResult, 'stars'>
+
 export type WorkerRequest = { challenge: Challenge; code: string }
 
 /** Contrato mínimo de um Web Worker, para permitir injeção em testes. */
 export interface WorkerLike {
-  onmessage: ((event: { data: RunResult }) => void) | null
+  onmessage: ((event: { data: ExecutionResult }) => void) | null
   onerror: ((event: { message?: string }) => void) | null
   postMessage(message: WorkerRequest): void
   terminate(): void
