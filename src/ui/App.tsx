@@ -8,7 +8,7 @@ import { t, type TextKey } from '../i18n/pt-BR'
 import { failureText } from '../i18n/failureText'
 import { BlocksEditor } from './BlocksEditor'
 import { generateCode, type BlocklyState } from '../blocks/generators'
-import { Board } from './Board'
+import { Board, CELL } from './Board'
 import { offersBlocks, rememberBlockCode, migratedCodeFor } from './editorMode'
 import { playableChallenges } from '../challenges/concepts'
 import { Stars } from './Stars'
@@ -144,7 +144,7 @@ export function App({ challengeId, language, onLanguageChange, codes, onCodesCha
         />
       </details>
       <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start', flexWrap: 'wrap' }}>
-      <section aria-label={t('challenge')} style={{ flex: '0 0 auto', maxWidth: '100%' }}>
+      <section aria-label={t('challenge')} style={{ flex: '0 0 auto', width: Math.max(280, challenge.width * CELL), maxWidth: '100%' }}>
       <h2>{t('challenge')}</h2>
       <Board challenge={challenge} frame={frames[index]} />
       <p role="status">{message}</p>

@@ -3,7 +3,7 @@ import type { Frame } from '../engine/replay'
 import { t } from '../i18n/pt-BR'
 
 const ARROW: Record<Facing, string> = { north: '▲', east: '▶', south: '▼', west: '◀' }
-const CELL = 56
+export const CELL = 56
 
 const same = (a: { x: number; y: number }, x: number, y: number) => a.x === x && a.y === y
 
